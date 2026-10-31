@@ -1,3 +1,24 @@
+import { parseIsoDate } from "@/lib/dates"
+
+// Solo formato: los saldos los calcula el backend, nunca el cliente.
+const soles = new Intl.NumberFormat("es-PE", {
+  style: "currency",
+  currency: "PEN",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})
+
+/** 1234.5 → "S/ 1,234.50" */
+export function formatSoles(amount: number | null | undefined): string {
+  return soles.format(amount ?? 0)
+}
+
+/** "2026-10-28" → "28 oct 2026", sin correr el dia por la zona horaria. */
+export function formatDate(iso: string | null | undefined): string {
+  if (!iso) return "—"
+  return parseIsoDate(iso).toLocaleDateString("es-PE", { day: "numeric", month: "short", year: "numeric" })
+}
+
 /** "Ana María Torres" → "Ana"; sin nombre, un saludo que igual funciona. */
 export function firstName(name: string | null | undefined): string {
   return name?.trim().split(/\s+/)[0] || "de nuevo"

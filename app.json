@@ -37,7 +37,13 @@
         }
       ],
       "expo-secure-store",
-      "expo-status-bar"
+      "expo-status-bar",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Cash-Out usa la cámara para leer el código QR de tus boletas."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

@@ -11,6 +11,7 @@ import { InstrumentSerif_400Regular, InstrumentSerif_400Regular_Italic } from "@
 import { useFonts } from "expo-font"
 import { Button } from "@/components/ui/Button"
 import { Text, Title } from "@/components/ui/Text"
+import { ToastProvider } from "@/components/ui/Toast"
 import { AuthProvider } from "@/contexts/AuthProvider"
 import { useAuth } from "@/hooks/useAuth"
 import { usePalette } from "@/theme/palette"
@@ -72,8 +73,10 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <AuthProvider>
-        <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
-        <RootNavigator />
+        <ToastProvider>
+          <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
+          <RootNavigator />
+        </ToastProvider>
       </AuthProvider>
     </SafeAreaProvider>
   )
