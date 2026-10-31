@@ -13,6 +13,8 @@ const TONES = {
   destructive: "text-destructive",
   income: "text-income",
   expense: "text-expense",
+  /** Sobre un fondo del color del texto, como el del aviso. */
+  inverse: "text-background",
 } as const
 
 interface TextProps extends NativeTextProps {
