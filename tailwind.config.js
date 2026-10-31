@@ -5,6 +5,14 @@ module.exports = {
   darkMode: "class",
   theme: {
     extend: {
+      // Una familia por peso: con fuentes propias, fontWeight no cambia de archivo en Android.
+      fontFamily: {
+        sans: ["Geist_400Regular"],
+        "sans-medium": ["Geist_500Medium"],
+        "sans-semibold": ["Geist_600SemiBold"],
+        display: ["InstrumentSerif_400Regular"],
+        "display-italic": ["InstrumentSerif_400Regular_Italic"],
+      },
       colors: {
         border: "var(--border)",
         input: "var(--input)",
