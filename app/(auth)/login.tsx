@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { KeyboardAvoidingView, Platform, ScrollView, Text, View } from "react-native"
+import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -8,6 +8,7 @@ import type { SessionEndReason } from "@/api/tokenStore"
 import { Button } from "@/components/ui/Button"
 import { Field } from "@/components/ui/Field"
 import { Notice } from "@/components/ui/Notice"
+import { Text, Title } from "@/components/ui/Text"
 import { useAuth } from "@/hooks/useAuth"
 import { applyServerFieldErrors } from "@/lib/formErrors"
 import { loginSchema, type LoginValues } from "@/lib/validation"
@@ -53,8 +54,8 @@ export default function LoginScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <View className="gap-2">
-            <Text className="text-4xl font-semibold text-foreground">Hola de nuevo</Text>
-            <Text className="text-base text-muted-foreground">
+            <Title size="xl">Hola de nuevo</Title>
+            <Text tone="muted" className="text-base">
               Ingresa para ver tu ahorro, tus metas y tu portafolio.
             </Text>
           </View>
