@@ -1,12 +1,12 @@
 import { Tabs } from "expo-router"
-import { ArrowLeftRight, Gamepad2, House, LineChart, UserRound, type LucideIcon } from "lucide-react-native"
+import { ArrowLeftRight, House, LineChart, Target, UserRound, type LucideIcon } from "lucide-react-native"
 import { usePalette } from "@/theme/palette"
 
 const TABS: { name: string; title: string; icon: LucideIcon }[] = [
   { name: "index", title: "Resumen", icon: House },
   { name: "movements", title: "Movimientos", icon: ArrowLeftRight },
+  { name: "goals", title: "Metas", icon: Target },
   { name: "portfolio", title: "Portafolio", icon: LineChart },
-  { name: "games", title: "Minijuegos", icon: Gamepad2 },
   { name: "profile", title: "Perfil", icon: UserRound },
 ]
 
@@ -36,6 +36,8 @@ export default function TabsLayout() {
           }}
         />
       ))}
+      {/* Minijuegos sale de las pestanas hasta tener contenido; la ruta queda para entrar desde el Portafolio. */}
+      <Tabs.Screen name="games" options={{ href: null }} />
     </Tabs>
   )
 }
