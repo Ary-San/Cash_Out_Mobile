@@ -44,6 +44,14 @@
           "cameraPermission": "Cash-Out usa la cámara para leer el código QR de tus boletas."
         }
       ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Cash-Out usa tus fotos solo para la foto de tu perfil.",
+          "cameraPermission": false,
+          "microphonePermission": false
+        }
+      ],
       "@react-native-community/datetimepicker"
     ],
     "experiments": {

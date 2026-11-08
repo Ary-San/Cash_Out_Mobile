@@ -13,6 +13,8 @@ export interface User {
   birthDate: string | null
   createdAt: string
   avatarUpdatedAt?: string
+  /** Entra solo con Google: no tiene contraseña que cambiar. */
+  googleOnly?: boolean
 }
 
 /** Respuesta de login, registro y refresh. */
