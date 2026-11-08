@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useRef, useState, type ComponentRef } from "react"
 import { View, type GestureResponderEvent } from "react-native"
 import Svg, { Circle, Line, Polygon, Polyline, Text as SvgText } from "react-native-svg"
 import { Text } from "@/components/ui/Text"
@@ -36,7 +36,7 @@ const PAD_Y = 16
 export function LineChart({ height, lines, guide, extremes, index = null, onScrub, tip, minSpan = 0.01, accessibilityLabel }: LineChartProps) {
   const colors = usePalette()
   const [width, setWidth] = useState(0)
-  const box = useRef<View>(null)
+  const box = useRef<ComponentRef<typeof View>>(null)
   const left = useRef(0)
 
   const all = lines.flatMap((line) => line.values).concat(guide ? [guide.value] : [])

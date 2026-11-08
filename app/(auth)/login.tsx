@@ -99,7 +99,8 @@ export default function LoginScreen() {
                   onChangeText={field.onChange}
                   onBlur={field.onBlur}
                   inputRef={field.ref}
-                  onSubmitEditing={form.handleSubmit(onSubmit)}
+                  // Desde RN 0.88 el evento del teclado no es un evento del DOM: handleSubmit se llama sin el.
+                  onSubmitEditing={() => void form.handleSubmit(onSubmit)()}
                   error={errors.password?.message}
                 />
               )}

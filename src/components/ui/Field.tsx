@@ -1,4 +1,4 @@
-import { useState, type Ref } from "react"
+import { useState, type ComponentRef, type Ref } from "react"
 import { Pressable, Text, TextInput, View, type TextInputProps } from "react-native"
 import { usePalette } from "@/theme/palette"
 
@@ -6,7 +6,8 @@ interface FieldProps extends TextInputProps {
   label: string
   error?: string
   secureToggle?: boolean
-  inputRef?: Ref<TextInput>
+  /** Desde RN 0.88 TextInput es un componente funcion: el ref apunta a su instancia. */
+  inputRef?: Ref<ComponentRef<typeof TextInput>>
 }
 
 export function Field({ label, error, secureToggle = false, inputRef, secureTextEntry, ...input }: FieldProps) {
