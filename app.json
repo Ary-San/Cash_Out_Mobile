@@ -43,7 +43,8 @@
         {
           "cameraPermission": "Cash-Out usa la cámara para leer el código QR de tus boletas."
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true,

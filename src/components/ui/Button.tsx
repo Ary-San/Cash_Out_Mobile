@@ -5,13 +5,13 @@ interface ButtonProps {
   onPress: () => void
   loading?: boolean
   disabled?: boolean
-  variant?: "primary" | "outline"
+  variant?: "primary" | "outline" | "destructive"
 }
 
 export function Button({ label, onPress, loading = false, disabled = false, variant = "primary" }: ButtonProps) {
   const inactive = disabled || loading
-  const surface = variant === "primary" ? "bg-primary" : "border border-border bg-transparent"
-  const ink = variant === "primary" ? "text-primary-foreground" : "text-foreground"
+  const surface = { primary: "bg-primary", outline: "border border-border bg-transparent", destructive: "bg-destructive" }[variant]
+  const ink = { primary: "text-primary-foreground", outline: "text-foreground", destructive: "text-primary-foreground" }[variant]
 
   return (
     <Pressable

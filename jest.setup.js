@@ -9,3 +9,10 @@ jest.mock("expo-secure-store", () => {
     deleteItemAsync: async (key) => void store.delete(key),
   }
 })
+
+// Reanimated y worklets son nativos: sus mocks oficiales hacen que las animaciones de entrada no fallen en Jest.
+jest.mock("react-native-worklets", () => require("react-native-worklets/src/mock"))
+jest.mock("react-native-reanimated", () => require("react-native-reanimated/mock"))
+
+// AsyncStorage es nativo: su mock oficial guarda en memoria.
+jest.mock("@react-native-async-storage/async-storage", () => require("@react-native-async-storage/async-storage/jest/async-storage-mock"))
