@@ -1,23 +1,19 @@
 import { useState } from "react"
-import { View } from "react-native"
 import { router } from "expo-router"
-import { Check, Circle } from "lucide-react-native"
 import { userMessage, toApiError } from "@/api/errors"
 import { Button } from "@/components/ui/Button"
 import { Field } from "@/components/ui/Field"
 import { Notice } from "@/components/ui/Notice"
+import { PasswordChecklist } from "@/components/ui/PasswordChecklist"
 import { Screen } from "@/components/ui/Screen"
-import { Text } from "@/components/ui/Text"
 import { useToast } from "@/components/ui/Toast"
 import { useAuth } from "@/hooks/useAuth"
-import { changePasswordSchema, passwordRules } from "@/lib/validation"
+import { changePasswordSchema } from "@/lib/validation"
 import { userService } from "@/services/userService"
-import { usePalette } from "@/theme/palette"
 
 type Key = "currentPassword" | "newPassword" | "confirmPassword"
 
 export default function PasswordScreen() {
-  const colors = usePalette()
   const toast = useToast()
   const { user, login, logout } = useAuth()
   const [values, setValues] = useState<Record<Key, string>>({ currentPassword: "", newPassword: "", confirmPassword: "" })
@@ -83,17 +79,7 @@ export default function PasswordScreen() {
         textContentType="newPassword"
         error={errors.newPassword}
       />
-      <View accessibilityLabel="Requisitos de la contraseña" className="flex-row flex-wrap gap-y-2 rounded-xl bg-muted px-3.5 py-3">
-        {passwordRules.map((rule) => {
-          const ok = rule.test(values.newPassword)
-          return (
-            <View key={rule.id} className="w-1/2 flex-row items-start gap-1.5 pr-2" accessibilityLabel={`${rule.label}: ${ok ? "cumplido" : "pendiente"}`}>
-              {ok ? <Check size={14} color={colors.gain} /> : <Circle size={14} color={colors.mutedForeground} />}
-              <Text tone={ok ? "gain" : "muted"} className="flex-1 text-[12.5px]">{rule.label}</Text>
-            </View>
-          )
-        })}
-      </View>
+      <PasswordChecklist value={values.newPassword} />
       <Field
         label="Repite la contraseña nueva"
         value={values.confirmPassword}

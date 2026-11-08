@@ -1,5 +1,6 @@
 import { useState } from "react"
-import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native"
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from "react-native"
+import { router } from "expo-router"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -54,7 +55,8 @@ export default function LoginScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <View className="gap-2">
-            <Title size="xl">Hola de nuevo</Title>
+            {/* "Hola de nuevo" no le sirve a quien recien llega (auditoria UX-03). */}
+            <Title size="xl">Hola</Title>
             <Text tone="muted" className="text-base">
               Ingresa para ver tu ahorro, tus metas y tu portafolio.
             </Text>
@@ -112,6 +114,12 @@ export default function LoginScreen() {
             loading={isSubmitting}
             onPress={form.handleSubmit(onSubmit)}
           />
+
+          <Pressable role="link" onPress={() => router.push("/register")} className="min-h-11 items-center justify-center">
+            <Text tone="muted" className="text-sm">
+              ¿No tienes cuenta? <Text weight="semibold" className="text-sm">Créala</Text>
+            </Text>
+          </Pressable>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

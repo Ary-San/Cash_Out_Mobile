@@ -40,6 +40,18 @@ export interface RegisterRequest {
   birthDate?: string
 }
 
+/** Respuesta del registro cuando el backend pide confirmar el correo antes de entrar. */
+export interface PendingVerification {
+  user: User
+  emailVerificationRequired: true
+}
+
+export interface RegisterResult {
+  user: User
+  /** true: no se abrio sesion; hay que confirmar el correo con el enlace que llego. */
+  verificationRequired: boolean
+}
+
 export interface UpdateUserRequest {
   name?: string
   birthDate?: string

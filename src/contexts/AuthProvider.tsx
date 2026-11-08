@@ -50,8 +50,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const register = useCallback(async (request: RegisterRequest, signal?: AbortSignal) => {
-    const auth = await authService.register(request, signal)
-    return auth.user
+    const result = await authService.register(request, signal)
+    // Con sesion abierta, Stack.Protected pasa solo al Resumen; si no, toca confirmar el correo.
+    return { user: result.user, verificationRequired: "emailVerificationRequired" in result }
   }, [])
 
   const logout = useCallback(() => authService.logout(), [])

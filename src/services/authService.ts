@@ -2,7 +2,7 @@ import { api, http } from "@/api/client"
 import { ApiError } from "@/api/errors"
 import { tokenStore } from "@/api/tokenStore"
 import { USE_MOCKS } from "@/config"
-import type { AuthResponse, LoginRequest, RegisterRequest } from "@/types/auth"
+import type { AuthResponse, LoginRequest, PendingVerification, RegisterRequest } from "@/types/auth"
 
 const MOCK_AUTH: AuthResponse = {
   accessToken: "mock-access",
@@ -38,13 +38,19 @@ export const authService = {
     return data
   },
 
-  async register(request: RegisterRequest, signal?: AbortSignal): Promise<AuthResponse> {
-    const { data } = await http.post<AuthResponse>("/auth/register", request, {
+  /** Si el backend pide confirmar el correo, no hay sesion todavia: solo se devuelve el usuario. */
+  async register(request: RegisterRequest, signal?: AbortSignal): Promise<AuthResponse | PendingVerification> {
+    const { data } = await http.post<AuthResponse | PendingVerification>("/auth/register", request, {
       skipAuthRefresh: true,
       signal,
     })
-    tokenStore.setSession(data)
+    if (!("emailVerificationRequired" in data)) tokenStore.setSession(data)
     return data
+  },
+
+  /** Vuelve a mandar el enlace de confirmacion. El backend responde igual exista o no el correo. */
+  async resendVerification(email: string): Promise<void> {
+    await http.post("/auth/resend-verification", { email }, { skipAuthRefresh: true })
   },
 
   restore(): Promise<AuthResponse> {
