@@ -19,6 +19,19 @@ export function formatDate(iso: string | null | undefined): string {
   return parseIsoDate(iso).toLocaleDateString("es-PE", { day: "numeric", month: "short", year: "numeric" })
 }
 
+const dateTime = new Intl.DateTimeFormat("es-PE", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false })
+
+/** El backend manda LocalDateTime en UTC sin zona: se le agrega para leerlo bien. */
+export function parseServerDateTime(iso: string): Date {
+  const hasZone = /(?:[zZ]|[+-]\d{2}:?\d{2})$/.test(iso)
+  return new Date(hasZone ? iso : `${iso}Z`)
+}
+
+/** "2026-11-03T20:45:00" → "3 nov 2026, 15:45" en hora local. */
+export function formatDateTime(iso: string | null | undefined): string {
+  return iso ? dateTime.format(parseServerDateTime(iso)) : "—"
+}
+
 /** "Ana María Torres" → "Ana"; sin nombre, un saludo que igual funciona. */
 export function firstName(name: string | null | undefined): string {
   return name?.trim().split(/\s+/)[0] || "de nuevo"

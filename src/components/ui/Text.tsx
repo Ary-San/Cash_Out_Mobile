@@ -13,6 +13,10 @@ const TONES = {
   destructive: "text-destructive",
   income: "text-income",
   expense: "text-expense",
+  warning: "text-warning",
+  /** Sube o baja: precios y ganancias. */
+  gain: "text-gain",
+  loss: "text-loss",
   /** Sobre un fondo del color del texto, como el del aviso. */
   inverse: "text-background",
 } as const

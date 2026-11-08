@@ -29,7 +29,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           className="absolute inset-x-5 items-center"
           style={{ bottom: insets.bottom + 72 }}
         >
-          <View role="status" aria-live="polite" className="rounded-full bg-foreground px-5 py-3">
+          <View role="status" aria-live="polite" className="rounded-2xl bg-foreground px-5 py-3">
             <Text weight="medium" tone="inverse" className="text-sm">{message.text}</Text>
           </View>
         </View>
