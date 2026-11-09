@@ -7,6 +7,8 @@ import { useAuth } from "@/hooks/useAuth"
  * (el Resumen) quedaba como "Unmatched Route". Aqui se manda a donde corresponde.
  */
 export default function NotFound() {
-  const { status } = useAuth()
-  return <Redirect href={status === "authenticated" ? "/" : "/login"} />
+  const { status, endReason } = useAuth()
+  if (status === "authenticated") return <Redirect href="/" />
+  // Quien acaba de cerrar sesion o vencio su sesion vuelve al login con el aviso; el resto ve la bienvenida.
+  return <Redirect href={endReason ? "/login" : "/welcome"} />
 }
