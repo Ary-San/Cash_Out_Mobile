@@ -12,6 +12,7 @@ module.exports = {
         "sans-semibold": ["Geist_600SemiBold"],
         display: ["InstrumentSerif_400Regular"],
         "display-italic": ["InstrumentSerif_400Regular_Italic"],
+        brand: ["RadioCanadaBig_700Bold"],
       },
       colors: {
         border: "var(--border)",

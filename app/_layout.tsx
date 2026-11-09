@@ -8,6 +8,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context"
 import { useColorScheme } from "nativewind"
 import { Geist_400Regular, Geist_500Medium, Geist_600SemiBold } from "@expo-google-fonts/geist"
 import { InstrumentSerif_400Regular, InstrumentSerif_400Regular_Italic } from "@expo-google-fonts/instrument-serif"
+import { RadioCanadaBig_700Bold } from "@expo-google-fonts/radio-canada-big"
 import { useFonts } from "expo-font"
 import { LockScreen } from "@/components/auth/LockScreen"
 import { Button } from "@/components/ui/Button"
@@ -35,6 +36,8 @@ function RootNavigator() {
     Geist_600SemiBold,
     InstrumentSerif_400Regular,
     InstrumentSerif_400Regular_Italic,
+    // Solo para el logotipo CASH-OUT, como en la web.
+    RadioCanadaBig_700Bold,
   })
   // Si una fuente no carga, la app sigue con la del sistema en vez de quedarse en el splash.
   const ready = status !== "restoring" && (fontsLoaded || fontError !== null)

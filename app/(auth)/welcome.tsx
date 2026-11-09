@@ -1,15 +1,14 @@
 import { useCallback, useState } from "react"
-import { Image, Text as NativeText, ScrollView, View, useWindowDimensions } from "react-native"
+import { Text as NativeText, ScrollView, View, useWindowDimensions } from "react-native"
 import { router, useFocusEffect } from "expo-router"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { ShieldCheck } from "lucide-react-native"
+import { BrandLogo } from "@/components/ui/BrandLogo"
 import { Button } from "@/components/ui/Button"
 import { Text, Title } from "@/components/ui/Text"
 import { GoalToTokens } from "@/components/welcome/GoalToTokens"
 import { SilkBackground } from "@/components/welcome/SilkBackground"
 import { usePalette } from "@/theme/palette"
-
-const ICON = require("../../assets/images/icon.png")
 
 /**
  * Lo primero que ve quien abre la app sin sesion: una meta que se cumple y se
@@ -35,9 +34,8 @@ export default function WelcomeScreen() {
       <SafeAreaView className="flex-1">
         {/* Con scroll: con letra grande o en pantallas chicas los botones siguen alcanzables. */}
         <ScrollView contentContainerClassName="w-full max-w-[480px] flex-grow self-center px-6" showsVerticalScrollIndicator={false}>
-        <View className="flex-row items-center gap-2 pt-3">
-          <Image source={ICON} accessibilityIgnoresInvertColors style={{ width: 28, height: 28, borderRadius: 8 }} />
-          <Text weight="semibold" className="text-base">Cash-Out</Text>
+        <View className="pt-3">
+          <BrandLogo />
         </View>
 
         <View className="flex-1 items-center justify-center py-4">

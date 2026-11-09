@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react"
-import { StyleSheet, useWindowDimensions, type LayoutChangeEvent } from "react-native"
+import { StyleSheet, View, useWindowDimensions, type LayoutChangeEvent } from "react-native"
 import { Canvas, Fill, LinearGradient, Rect, Shader, Skia, useClock, vec } from "@shopify/react-native-skia"
 import { useDerivedValue, useSharedValue } from "react-native-reanimated"
 import { useColorScheme } from "nativewind"
@@ -57,7 +57,10 @@ function rgb(hex: string): [number, number, number] {
 export function SilkBackground({ active = true }: { active?: boolean }) {
   // El tamano real del lienzo: en Android con la barra de navegacion transparente es mas alto que la ventana.
   const windowSize = useWindowDimensions()
-  const [size, setSize] = useState({ width: windowSize.width, height: windowSize.height })
+  const [size, setSize] = useState({
+    width: windowSize.width,
+    height: windowSize.height,
+  })
   const { width, height } = size
   const onLayout = (event: LayoutChangeEvent) => {
     const { width: w, height: h } = event.nativeEvent.layout
@@ -79,15 +82,18 @@ export function SilkBackground({ active = true }: { active?: boolean }) {
 
   if (!SOURCE) return null
   return (
-    <Canvas style={StyleSheet.absoluteFill} pointerEvents="none" onLayout={onLayout}>
-      <Fill>
-        <Shader source={SOURCE} uniforms={uniforms} />
-      </Fill>
-      {/* El velo: la seda se apaga hacia abajo y deja el titular y los botones sobre el fondo. */}
-      {/* Con margen de sobra abajo: si el lienzo mide mas que la ventana, la seda no asoma bajo los botones. */}
-      <Rect x={0} y={height * 0.42} width={width} height={height * 0.58 + 400}>
-        <LinearGradient start={vec(0, height * 0.42)} end={vec(0, height * 0.66)} colors={[`${background}00`, background]} />
-      </Rect>
-    </Canvas>
+    // Skia no acepta onLayout en el Canvas con la nueva arquitectura: lo mide el View que lo envuelve.
+    <View style={StyleSheet.absoluteFill} pointerEvents="none" onLayout={onLayout}>
+      <Canvas style={StyleSheet.absoluteFill}>
+        <Fill>
+          <Shader source={SOURCE} uniforms={uniforms} />
+        </Fill>
+        {/* El velo: la seda se apaga hacia abajo y deja el titular y los botones sobre el fondo. */}
+        {/* Con margen de sobra abajo: si el lienzo mide mas que la ventana, la seda no asoma bajo los botones. */}
+        <Rect x={0} y={height * 0.42} width={width} height={height * 0.58 + 400}>
+          <LinearGradient start={vec(0, height * 0.42)} end={vec(0, height * 0.66)} colors={[`${background}00`, background]} />
+        </Rect>
+      </Canvas>
+    </View>
   )
 }
