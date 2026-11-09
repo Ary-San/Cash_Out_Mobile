@@ -41,7 +41,7 @@ export function TokenChip({ balance }: { balance: number }) {
     <View
       accessible
       accessibilityLabel={`${balance} fichas para el simulador`}
-      className="h-9 flex-row items-center gap-1.5 rounded-full border border-border bg-card px-3"
+      className="min-h-9 flex-row items-center gap-1.5 rounded-full border border-border bg-card px-3"
     >
       <CircleDot size={16} color={colors.accentInk} />
       <Text weight="medium" className="text-[13px]">{balance} fichas</Text>

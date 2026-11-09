@@ -74,7 +74,7 @@ export default function GoalsScreen() {
                 role="radio"
                 aria-checked={grouping === g.value}
                 onPress={() => setGrouping(g.value)}
-                className={`h-11 justify-center rounded-full border px-4 ${grouping === g.value ? "border-accent-ink bg-accent" : "border-border"}`}
+                className={`min-h-11 justify-center rounded-full border px-4 ${grouping === g.value ? "border-accent-ink bg-accent" : "border-border"}`}
               >
                 <Text weight={grouping === g.value ? "semibold" : "regular"} className="text-[13px]">{g.label}</Text>
               </Pressable>
@@ -121,8 +121,8 @@ export default function GoalsScreen() {
       <Pressable
         role="button"
         onPress={() => setCreating((n) => n + 1)}
-        className="absolute bottom-5 right-5 h-14 flex-row items-center gap-2 rounded-full bg-primary px-[22px] active:opacity-80"
-        style={{ elevation: 4, shadowColor: "#181928", shadowOpacity: 0.3, shadowRadius: 12, shadowOffset: { width: 0, height: 8 } }}
+        className="absolute bottom-5 right-5 min-h-14 flex-row items-center gap-2 rounded-full bg-primary px-[22px] active:opacity-80"
+        style={{ elevation: 4, shadowColor: colors.shadow, shadowOpacity: 0.3, shadowRadius: 12, shadowOffset: { width: 0, height: 8 } }}
       >
         <Plus size={18} color={colors.background} />
         <Text weight="medium" tone="inverse" className="text-[15px]">Nueva meta</Text>

@@ -1,5 +1,7 @@
 import { Pressable, View } from "react-native"
 import { Text } from "@/components/ui/Text"
+import { TOUCH_SLOP } from "@/lib/touch"
+import { haptics } from "@/lib/haptics"
 
 interface SegmentedProps<T extends string> {
   label: string
@@ -17,11 +19,15 @@ export function Segmented<T extends string>({ label, options, value, onChange }:
         const selected = option.value === value
         return (
           <Pressable
+            hitSlop={TOUCH_SLOP}
             key={option.value}
-            onPress={() => onChange(option.value)}
+            onPress={() => {
+              if (!selected) haptics.selection()
+              onChange(option.value)
+            }}
             role="radio"
             aria-checked={selected}
-            className={`h-10 flex-1 items-center justify-center rounded-full ${selected ? "bg-card" : ""}`}
+            className={`min-h-10 flex-1 items-center justify-center rounded-full ${selected ? "bg-card" : ""}`}
           >
             <Text weight={selected ? "medium" : "regular"} tone={selected ? "default" : "muted"} className="text-sm">
               {option.label}

@@ -25,7 +25,7 @@ export function Sheet({ visible, onClose, title, locked = false, children }: She
       <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <Pressable accessibilityLabel="Cerrar" onPress={close} className="flex-1 bg-black/45" />
         {/* Animated.View no toma las clases de NativeWind: anima el contenedor y el View de adentro lleva el estilo. */}
-        <Animated.View entering={SlideInDown.duration(320)} accessibilityViewIsModal>
+        <Animated.View entering={SlideInDown.duration(320)} accessibilityViewIsModal style={{ width: "100%", maxWidth: 640, alignSelf: "center" }}>
           <View className="gap-4 rounded-t-[28px] bg-card px-5 pt-2.5" style={{ paddingBottom: insets.bottom + 20 }}>
             <View className="h-[5px] w-10 self-center rounded-full bg-border" />
             {title ? <Title size="md">{title}</Title> : null}

@@ -42,6 +42,7 @@ import { portfolioService } from "@/services/portfolioService"
 import type { OrderSide, TradeOrder } from "@/types/market"
 import type { NewsItem } from "@/types/news"
 import { usePalette } from "@/theme/palette"
+import { TOUCH_SLOP } from "@/lib/touch"
 
 const BENCHMARK = "SPY"
 type ChartView = ChartRange | "LIVE"
@@ -237,7 +238,7 @@ export default function AssetScreen() {
             {ranges.map((range) => {
               const on = current === range.key
               return (
-                <Pressable key={range.key} role="radio" aria-checked={on} onPress={() => setView(range.key)} className={`h-9 flex-1 items-center justify-center rounded-full ${on ? "bg-card" : ""}`}>
+                <Pressable hitSlop={TOUCH_SLOP} key={range.key} role="radio" aria-checked={on} onPress={() => setView(range.key)} className={`min-h-9 flex-1 items-center justify-center rounded-full ${on ? "bg-card" : ""}`}>
                   <Text weight={on ? "semibold" : "regular"} tone={on ? "default" : "muted"} className="text-xs">{range.label}</Text>
                 </Pressable>
               )
@@ -245,10 +246,11 @@ export default function AssetScreen() {
           </View>
           {comparable && current !== "LIVE" ? (
             <Pressable
+              hitSlop={TOUCH_SLOP}
               role="button"
               aria-pressed={compare}
               onPress={() => setCompare(!compare)}
-              className={`h-9 flex-row items-center gap-1.5 self-start rounded-full border px-3 ${compare ? "border-accent-ink bg-accent" : "border-border"}`}
+              className={`min-h-9 flex-row items-center gap-1.5 self-start rounded-full border px-3 ${compare ? "border-accent-ink bg-accent" : "border-border"}`}
             >
               <TrendingUp size={14} color={colors.foreground} />
               <Text weight={compare ? "semibold" : "regular"} className="text-[13px]">{compare ? "vs S&P 500 · quitar" : "Comparar con S&P 500"}</Text>

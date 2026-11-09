@@ -1,3 +1,4 @@
+import { Text } from "react-native"
 import { Tabs } from "expo-router"
 import { ArrowLeftRight, House, LineChart, Target, UserRound, type LucideIcon } from "lucide-react-native"
 import { usePalette } from "@/theme/palette"
@@ -32,6 +33,12 @@ export default function TabsLayout() {
           name={name}
           options={{
             title,
+            // La etiqueta crece poco con la letra del sistema: con mas, "Movimientos" no entra en 1/5 de pantalla.
+            tabBarLabel: ({ color }) => (
+              <Text maxFontSizeMultiplier={1.2} numberOfLines={1} style={{ color, fontFamily: "Geist_500Medium", fontSize: 10 }}>
+                {title}
+              </Text>
+            ),
             tabBarIcon: ({ color, focused }) => <Icon size={22} color={color} strokeWidth={focused ? 2.2 : 1.8} />,
           }}
         />

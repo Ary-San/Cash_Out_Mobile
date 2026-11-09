@@ -18,6 +18,7 @@ import { changeTone, formatSignedPercent, formatUsd } from "@/lib/market"
 import { marketService } from "@/services/marketService"
 import type { Asset, AssetQuote, AssetType, Position, PricePoint } from "@/types/market"
 import { usePalette } from "@/theme/palette"
+import { TOUCH_SLOP } from "@/lib/touch"
 
 const PAGE = 20
 const FACETS: { value: "" | AssetType; label: string }[] = [
@@ -150,7 +151,7 @@ export function MarketSection({ positions }: MarketSectionProps) {
 
       <Card className="overflow-hidden p-0">
         <View className="gap-2.5 p-4 pb-3">
-          <View className="h-12 flex-row items-center gap-2 rounded-xl border border-input bg-card px-3.5">
+          <View className="min-h-12 flex-row items-center gap-2 rounded-xl border border-input bg-card px-3.5">
             <Search size={18} color={colors.mutedForeground} />
             <TextInput
               value={text}
@@ -175,7 +176,7 @@ export function MarketSection({ positions }: MarketSectionProps) {
             ))}
           </View>
           {hasFilters ? (
-            <Pressable role="button" onPress={clear} className="h-9 flex-row items-center gap-1.5 self-start active:opacity-70">
+            <Pressable hitSlop={TOUCH_SLOP} role="button" onPress={clear} className="min-h-9 flex-row items-center gap-1.5 self-start active:opacity-70">
               <X size={16} color={colors.foreground} />
               <Text weight="medium" className="text-sm">Limpiar filtros</Text>
             </Pressable>
@@ -213,7 +214,7 @@ export function MarketSection({ positions }: MarketSectionProps) {
             ))}
             {!mine && hasMore ? (
               <View className="border-t border-border p-3">
-                <Pressable role="button" disabled={loadMore.isPending} onPress={() => void loadMore.run()} className="h-10 items-center justify-center rounded-full border border-border active:opacity-70">
+                <Pressable hitSlop={TOUCH_SLOP} role="button" disabled={loadMore.isPending} onPress={() => void loadMore.run()} className="min-h-10 items-center justify-center rounded-full border border-border active:opacity-70">
                   <Text weight="medium" className="text-sm">{loadMore.isPending ? "Cargando…" : "Cargar más"}</Text>
                 </Pressable>
               </View>
@@ -229,10 +230,11 @@ export function MarketSection({ positions }: MarketSectionProps) {
 function Chip({ on, label, count, onPress }: { on: boolean; label: string; count?: number; onPress: () => void }) {
   return (
     <Pressable
+      hitSlop={TOUCH_SLOP}
       role="button"
       aria-pressed={on}
       onPress={onPress}
-      className={`h-9 flex-row items-center gap-1.5 rounded-full border px-3 ${on ? "border-accent-ink bg-accent" : "border-border bg-card"}`}
+      className={`min-h-9 flex-row items-center gap-1.5 rounded-full border px-3 ${on ? "border-accent-ink bg-accent" : "border-border bg-card"}`}
     >
       <Text weight={on ? "semibold" : "regular"} className="text-[13px]">{label}</Text>
       {count !== undefined ? <Text tone="muted" className="text-[13px]">{count.toLocaleString("es-PE")}</Text> : null}

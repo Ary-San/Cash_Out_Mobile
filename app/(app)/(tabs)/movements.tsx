@@ -6,7 +6,7 @@ import { PhraseComposer } from "@/components/assistant/PhraseComposer"
 import { MovementRow } from "@/components/movements/MovementRow"
 import { Button } from "@/components/ui/Button"
 import { Card } from "@/components/ui/Card"
-import { Screen } from "@/components/ui/Screen"
+import { ListScreen } from "@/components/ui/Screen"
 import { Segmented } from "@/components/ui/Segmented"
 import { EmptyState, ErrorState, Skeleton } from "@/components/ui/States"
 import { useApiQuery } from "@/hooks/useApiQuery"
@@ -57,11 +57,29 @@ export default function MovementsScreen() {
   const hasMore = query.data ? query.data.totalElements > movements.length : false
 
   return (
-    <Screen
+    <ListScreen
       title="Movimientos"
       subtitle="Tus gastos e ingresos"
       onRefresh={reload}
       refreshing={query.isRefreshing}
+      items={movements}
+      keyExtractor={movementKey}
+      renderItem={({ item, index }) => (
+        // Cada fila arma su tramo de la tarjeta: asi la lista se ve como una sola tarjeta, igual que antes.
+        <View
+          className={`border-x border-border bg-card px-4 ${index === 0 ? "rounded-t-2xl border-t pt-1" : ""} ${index === movements.length - 1 ? "rounded-b-2xl border-b pb-1" : ""}`}
+        >
+          <View className={index > 0 ? "border-t border-border" : ""}>
+            <MovementRow
+              movement={item}
+              onPress={() => router.push({ pathname: "/movement/[kind]/[id]", params: { kind: item.kind, id: item.id } })}
+            />
+          </View>
+        </View>
+      )}
+      footer={
+        hasMore ? <Button label="Ver más" variant="outline" loading={query.isRefreshing} onPress={() => setPages((n) => n + 1)} /> : null
+      }
       action={
         <View className="flex-row gap-2">
           <Pressable
@@ -119,25 +137,6 @@ export default function MovementsScreen() {
           action={{ label: "Registrar a mano", onPress: () => router.push("/movement/new") }}
         />
       ) : null}
-
-      {movements.length > 0 ? (
-        <Card className="py-1">
-          {movements.map((movement, index) => (
-            <View key={movementKey(movement)} className={index > 0 ? "border-t border-border" : ""}>
-              <MovementRow
-                movement={movement}
-                onPress={() =>
-                  router.push({ pathname: "/movement/[kind]/[id]", params: { kind: movement.kind, id: movement.id } })
-                }
-              />
-            </View>
-          ))}
-        </Card>
-      ) : null}
-
-      {hasMore ? (
-        <Button label="Ver más" variant="outline" loading={query.isRefreshing} onPress={() => setPages((n) => n + 1)} />
-      ) : null}
-    </Screen>
+    </ListScreen>
   )
 }

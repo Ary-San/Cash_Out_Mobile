@@ -7,7 +7,9 @@ import type { ExpenseCategory } from "@/types/movements"
  */
 export type Palette = Record<
   | "background" | "foreground" | "card" | "primary" | "muted" | "mutedForeground"
-  | "accent" | "accentInk" | "border" | "destructive" | "income" | "expense" | "warning" | "gain" | "loss",
+  | "accent" | "accentInk" | "border" | "destructive" | "income" | "expense" | "warning" | "gain" | "loss"
+  /** Solo para sombras: en oscuro casi no se ven, ahi el contraste lo da el color del boton. */
+  | "shadow",
   string
 >
 
@@ -28,6 +30,7 @@ export const palette: Record<"light" | "dark", Palette> = {
     warning: "#81632f",
     gain: "#0b7a55",
     loss: "#b91c1c",
+    shadow: "#181928",
   },
   dark: {
     background: "#0c0c15",
@@ -45,6 +48,7 @@ export const palette: Record<"light" | "dark", Palette> = {
     warning: "#d5ba82",
     gain: "#29a87c",
     loss: "#e05a5a",
+    shadow: "#000000",
   },
 }
 
@@ -79,4 +83,10 @@ export function useSeriesColors(): string[] {
 export function useCategoryColors(): Record<ExpenseCategory, string> {
   const { colorScheme } = useColorScheme()
   return categoryColors[colorScheme === "dark" ? "dark" : "light"]
+}
+
+/** Los pliegues de la seda de la bienvenida, de la sombra al brillo: los mismos de la portada web. */
+export const silk: Record<"light" | "dark", readonly string[]> = {
+  light: ["#f8f8f9", "#f3edf3", "#e9dfe8", "#dccfdb", "#c9b6c8", "#b7a0b5", "#a48aa2", "#8f7590"],
+  dark: ["#0c0c15", "#121320", "#1d1d2d", "#2e2a3e", "#463a50", "#634e62", "#87708a", "#ac93aa"],
 }

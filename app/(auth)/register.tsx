@@ -61,7 +61,7 @@ export default function RegisterScreen() {
   return (
     <SafeAreaView className="flex-1 bg-background">
       <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === "ios" ? "padding" : undefined}>
-        <ScrollView contentContainerClassName="flex-grow justify-center gap-6 px-6 py-8" keyboardShouldPersistTaps="handled">
+        <ScrollView contentContainerClassName="w-full max-w-[480px] flex-grow justify-center gap-6 self-center px-6 py-8" keyboardShouldPersistTaps="handled">
           <View className="gap-2">
             <Title size="xl">Crea tu cuenta</Title>
             <Text tone="muted" className="text-base">
@@ -215,7 +215,7 @@ function CheckYourEmail({ email }: { email: string }) {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <View className="flex-1 justify-center gap-5 px-6">
+      <View className="w-full max-w-[480px] flex-1 justify-center gap-5 self-center px-6">
         <View className="size-14 items-center justify-center rounded-2xl bg-accent">
           <MailCheck size={26} color={colors.accentInk} />
         </View>

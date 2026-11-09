@@ -6,6 +6,7 @@ import { Text } from "@/components/ui/Text"
 import { changeTone, displayName, formatSignedPercent } from "@/lib/market"
 import { formatNewsStamp, sourceLabel } from "@/lib/news"
 import type { NewsAsset, NewsItem } from "@/types/news"
+import { TOUCH_SLOP } from "@/lib/touch"
 
 interface NewsReaderSheetProps {
   news: NewsItem | null
@@ -48,7 +49,7 @@ export function NewsReaderSheet({ news, heldIds, saved, onToggleSave, onTrade, o
                     <Text tone="muted" numberOfLines={1} className="flex-1 text-xs">{displayName(asset.name)}</Text>
                     <Text weight="semibold" tone={changeTone(asset.changePercent)} className="text-xs">{formatSignedPercent(asset.changePercent)}</Text>
                   </Pressable>
-                  <Pressable role="button" onPress={() => onTrade(asset)} className="h-9 justify-center rounded-full bg-primary px-3.5 active:opacity-80">
+                  <Pressable hitSlop={TOUCH_SLOP} role="button" onPress={() => onTrade(asset)} className="min-h-9 justify-center rounded-full bg-primary px-3.5 active:opacity-80">
                     <Text weight="medium" className="text-[13px] text-primary-foreground">Comprar</Text>
                   </Pressable>
                 </View>

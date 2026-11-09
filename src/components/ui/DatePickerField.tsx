@@ -71,7 +71,7 @@ export function DatePickerField({ label, value, onChange, fallback, min, max, er
         onPress={() =>
           DateTimePickerAndroid.open({ value: current, mode: "date", minimumDate, maximumDate, onValueChange: (_, date) => onChange(toIso(date)) })
         }
-        className={`h-12 flex-row items-center gap-2 rounded-xl border bg-card px-4 ${error ? "border-destructive" : "border-input"}`}
+        className={`min-h-12 flex-row items-center gap-2 rounded-xl border bg-card px-4 ${error ? "border-destructive" : "border-input"}`}
       >
         <CalendarDays size={18} color={colors.mutedForeground} />
         <Text className="text-base">{value ? formatDate(value) : "Elegir fecha"}</Text>

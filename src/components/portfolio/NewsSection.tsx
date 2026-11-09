@@ -14,6 +14,7 @@ import { newsService } from "@/services/newsService"
 import type { Position } from "@/types/market"
 import type { NewsItem, NewsScope } from "@/types/news"
 import { usePalette } from "@/theme/palette"
+import { TOUCH_SLOP } from "@/lib/touch"
 
 const SCOPE_TEXT: Record<NewsScope, string> = { mine: "de tus inversiones", market: "del mercado", crypto: "de cripto" }
 
@@ -91,7 +92,7 @@ export function NewsSection({ positions, onTrade }: NewsSectionProps) {
         {NEWS_SCOPES.map((option) => {
           const on = !symbol && !onlySaved && scope === option.value
           return (
-            <Pressable key={option.value} role="radio" aria-checked={on} onPress={() => pickScope(option.value)} className={`h-9 flex-1 items-center justify-center rounded-full ${on ? "bg-card" : ""}`}>
+            <Pressable hitSlop={TOUCH_SLOP} key={option.value} role="radio" aria-checked={on} onPress={() => pickScope(option.value)} className={`min-h-9 flex-1 items-center justify-center rounded-full ${on ? "bg-card" : ""}`}>
               <Text weight={on ? "semibold" : "regular"} tone={on ? "default" : "muted"} className="text-[13px]">{option.label}</Text>
             </Pressable>
           )
@@ -100,16 +101,17 @@ export function NewsSection({ positions, onTrade }: NewsSectionProps) {
 
       <View className="flex-row flex-wrap items-center gap-2">
         <Pressable
+          hitSlop={TOUCH_SLOP}
           role="button"
           aria-pressed={onlySaved}
           onPress={() => setOnlySaved(!onlySaved)}
-          className={`h-9 flex-row items-center gap-1.5 rounded-full border px-3 ${onlySaved ? "border-accent-ink bg-accent" : "border-border bg-card"}`}
+          className={`min-h-9 flex-row items-center gap-1.5 rounded-full border px-3 ${onlySaved ? "border-accent-ink bg-accent" : "border-border bg-card"}`}
         >
           <Star size={14} color={colors.foreground} />
           <Text weight={onlySaved ? "semibold" : "regular"} className="text-[13px]">Guardadas · {saved.saved.length}</Text>
         </Pressable>
         {symbol ? (
-          <View className="h-9 flex-row items-center gap-1 rounded-full border border-accent-ink bg-accent pl-3 pr-1">
+          <View className="min-h-9 flex-row items-center gap-1 rounded-full border border-accent-ink bg-accent pl-3 pr-1">
             <Text className="text-[13px]">Símbolo: <Text weight="semibold" className="text-[13px]">{symbol}</Text></Text>
             <Pressable role="button" aria-label="Quitar el filtro de símbolo" onPress={() => setSymbol(undefined)} className="size-7 items-center justify-center rounded-full">
               <X size={14} color={colors.foreground} />
@@ -153,7 +155,7 @@ export function NewsSection({ positions, onTrade }: NewsSectionProps) {
                       <Text weight="semibold" className="text-[15px] leading-5">{news.headline}</Text>
                       <Text tone="muted" className="text-xs">{sourceLabel(news.source)} · {formatNewsStamp(news)}</Text>
                     </Pressable>
-                    <Pressable role="button" aria-pressed={isSaved} onPress={() => saved.toggle(news)} className="min-h-8 flex-row items-center gap-1.5 self-start">
+                    <Pressable hitSlop={TOUCH_SLOP} role="button" aria-pressed={isSaved} onPress={() => saved.toggle(news)} className="min-h-8 flex-row items-center gap-1.5 self-start">
                       <Star size={15} color={colors.mutedForeground} fill={isSaved ? colors.mutedForeground : "transparent"} />
                       <Text weight="medium" tone="muted" className="text-[13px]">{isSaved ? "Guardada" : "Guardar"}</Text>
                     </Pressable>
@@ -164,7 +166,7 @@ export function NewsSection({ positions, onTrade }: NewsSectionProps) {
           ))}
           {!onlySaved && feed.hasMore ? (
             <View className="border-t border-border p-3">
-              <Pressable role="button" disabled={feed.isLoadingMore} onPress={() => void feed.loadMore()} className="h-10 items-center justify-center rounded-full border border-border active:opacity-70">
+              <Pressable hitSlop={TOUCH_SLOP} role="button" disabled={feed.isLoadingMore} onPress={() => void feed.loadMore()} className="min-h-10 items-center justify-center rounded-full border border-border active:opacity-70">
                 <Text weight="medium" className="text-sm">{feed.isLoadingMore ? "Cargando…" : "Cargar más noticias"}</Text>
               </Pressable>
             </View>
@@ -200,7 +202,7 @@ export function NewsSection({ positions, onTrade }: NewsSectionProps) {
 
 function Chip({ on, label, onPress }: { on: boolean; label: string; onPress: () => void }) {
   return (
-    <Pressable role="button" aria-pressed={on} onPress={onPress} className={`h-9 justify-center rounded-full border px-3 ${on ? "border-accent-ink bg-accent" : "border-border bg-card"}`}>
+    <Pressable hitSlop={TOUCH_SLOP} role="button" aria-pressed={on} onPress={onPress} className={`min-h-9 justify-center rounded-full border px-3 ${on ? "border-accent-ink bg-accent" : "border-border bg-card"}`}>
       <Text weight={on ? "semibold" : "regular"} className="text-[13px]">{label}</Text>
     </Pressable>
   )
@@ -230,7 +232,7 @@ function EmptyNews({ onlySaved, symbol, scope, hasPositions, onReset }: { onlySa
       <Text weight="semibold" className="text-center">{title}</Text>
       <Text tone="muted" className="text-center text-[13px] leading-5">{text}</Text>
       {onlySaved || symbol || scope !== "market" ? (
-        <Pressable role="button" onPress={onReset} className="mt-1 h-10 justify-center rounded-full border border-border px-4 active:opacity-70">
+        <Pressable hitSlop={TOUCH_SLOP} role="button" onPress={onReset} className="mt-1 min-h-10 justify-center rounded-full border border-border px-4 active:opacity-70">
           <Text weight="medium" className="text-sm">Ver todo el mercado</Text>
         </Pressable>
       ) : null}

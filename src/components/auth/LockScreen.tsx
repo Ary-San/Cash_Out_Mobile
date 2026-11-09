@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth"
 import { authenticate, biometricSupport } from "@/lib/biometrics"
 import { firstName } from "@/lib/format"
 import { usePalette } from "@/theme/palette"
+import { haptics } from "@/lib/haptics"
 
 /** Pide la huella si se puede. Si se quito la huella del celular despues de activarla, no se queda encerrado. */
 async function check(): Promise<{ label: string; ok: boolean }> {
@@ -32,7 +33,10 @@ export function LockScreen({ onUnlock }: { onUnlock: () => void }) {
   const apply = (result: { label: string; ok: boolean }) => {
     setLabel(result.label)
     setBusy(false)
-    if (result.ok) onUnlock()
+    if (result.ok) {
+      haptics.success()
+      onUnlock()
+    }
     else setFailed(true)
   }
 
@@ -43,7 +47,10 @@ export function LockScreen({ onUnlock }: { onUnlock: () => void }) {
       if (!alive) return
       setLabel(result.label)
       setBusy(false)
-      if (result.ok) onUnlock()
+      if (result.ok) {
+        haptics.success()
+        onUnlock()
+      }
       else setFailed(true)
     })
     return () => {
@@ -58,7 +65,7 @@ export function LockScreen({ onUnlock }: { onUnlock: () => void }) {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <View className="flex-1 justify-center gap-5 px-8">
+      <View className="w-full max-w-[480px] flex-1 justify-center gap-5 self-center px-8">
         <View className="size-16 items-center justify-center self-center rounded-full bg-accent">
           <Fingerprint size={32} color={colors.accentInk} />
         </View>

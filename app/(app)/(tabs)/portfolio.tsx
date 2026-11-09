@@ -54,7 +54,7 @@ export default function PortfolioScreen() {
         title="Tu portafolio"
         subtitle="Inviertes fichas en acciones de EE. UU. y criptomonedas con precios reales: nada de esto es dinero real."
         action={
-          <View aria-label={tokens === undefined ? undefined : `Tienes ${formatTokenAmount(tokens)} fichas libres para invertir`} className="h-9 flex-row items-center gap-1.5 rounded-full border border-border bg-card px-3">
+          <View aria-label={tokens === undefined ? undefined : `Tienes ${formatTokenAmount(tokens)} fichas libres para invertir`} className="min-h-9 flex-row items-center gap-1.5 rounded-full border border-border bg-card px-3">
             <Text weight="semibold" className="text-[13px]">{tokens === undefined ? "—" : formatTokenAmount(tokens)}</Text>
             <Text tone="muted" className="text-[13px]">libres</Text>
           </View>
@@ -71,7 +71,7 @@ export default function PortfolioScreen() {
                 role="tab"
                 aria-selected={on}
                 onPress={() => setSection(value)}
-                className="-mb-px h-11 flex-row items-center gap-1.5 border-b-2 px-2.5"
+                className="-mb-px min-h-11 flex-row items-center gap-1.5 border-b-2 px-2.5"
                 style={{ borderBottomColor: on ? colors.accentInk : "transparent" }}
               >
                 <Icon size={16} color={on ? colors.foreground : colors.mutedForeground} />

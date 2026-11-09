@@ -12,6 +12,7 @@ import { changeTone, formatQuantity, formatSigned, formatSignedPercent, formatTo
 import { marketService } from "@/services/marketService"
 import type { OrderSide, Position, PricePoint } from "@/types/market"
 import { usePalette } from "@/theme/palette"
+import { TOUCH_SLOP } from "@/lib/touch"
 
 interface PositionsCardProps {
   positions: Position[] | undefined
@@ -32,7 +33,7 @@ export function PositionsCard({ positions, closes, colorOf, onTrade, onExplore }
     <Card className="overflow-hidden p-0">
       <View className="flex-row items-center justify-between py-1.5 pl-4 pr-1.5">
         <Text weight="semibold" className="text-[15px]">Mis inversiones</Text>
-        <Pressable role="button" onPress={onExplore} className="h-10 flex-row items-center gap-1.5 rounded-full px-2.5 active:opacity-70">
+        <Pressable hitSlop={TOUCH_SLOP} role="button" onPress={onExplore} className="min-h-10 flex-row items-center gap-1.5 rounded-full px-2.5 active:opacity-70">
           <Search size={16} color={colors.foreground} />
           <Text weight="medium" className="text-sm">Explorar mercado</Text>
         </Pressable>

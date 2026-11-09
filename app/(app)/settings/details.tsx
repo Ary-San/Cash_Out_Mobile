@@ -106,7 +106,7 @@ function DetailsForm({ initial }: { initial: User }) {
             <UserAvatar user={user} size={96} preview={preview} />
           </View>
           <View className="flex-row gap-2">
-            <Pressable role="button" onPress={() => void pickPhoto()} className="h-11 flex-row items-center gap-2 rounded-full border border-border bg-card px-4 active:opacity-70">
+            <Pressable role="button" onPress={() => void pickPhoto()} className="min-h-11 flex-row items-center gap-2 rounded-full border border-border bg-card px-4 active:opacity-70">
               <Camera size={16} color={colors.foreground} />
               <Text weight="medium" className="text-sm">{hasPhoto ? "Cambiar foto" : "Elegir foto"}</Text>
             </Pressable>
@@ -114,7 +114,7 @@ function DetailsForm({ initial }: { initial: User }) {
               <Pressable
                 role="button"
                 onPress={() => setPhoto(user.avatarUpdatedAt ? { kind: "remove" } : KEEP)}
-                className="h-11 justify-center rounded-full px-4 active:opacity-70"
+                className="min-h-11 justify-center rounded-full px-4 active:opacity-70"
               >
                 <Text weight="medium" tone="muted" className="text-sm">Quitar</Text>
               </Pressable>

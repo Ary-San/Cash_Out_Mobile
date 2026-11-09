@@ -20,6 +20,12 @@ jest.mock("@react-native-async-storage/async-storage", () => require("@react-nat
 // La biometria es nativa: por defecto hay lector y huella registrada, y se acepta.
 jest.mock("@react-native-community/netinfo", () => require("@react-native-community/netinfo/jest/netinfo-mock.js"))
 
+jest.mock("expo-haptics", () => ({
+  notificationAsync: jest.fn(() => Promise.resolve()),
+  selectionAsync: jest.fn(() => Promise.resolve()),
+  NotificationFeedbackType: { Success: "success", Warning: "warning", Error: "error" },
+}))
+
 jest.mock("expo-local-authentication", () => ({
   AuthenticationType: { FINGERPRINT: 1, FACIAL_RECOGNITION: 2 },
   hasHardwareAsync: jest.fn().mockResolvedValue(true),

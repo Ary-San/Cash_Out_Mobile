@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
-import { Image, Platform, View } from "react-native"
+import { Platform, View } from "react-native"
+import { Image } from "expo-image"
 import { tokenStore } from "@/api/tokenStore"
 import { Title } from "@/components/ui/Text"
 import { API_URL } from "@/config"
@@ -40,7 +41,8 @@ export function UserAvatar({ user, size, preview }: UserAvatarProps) {
       style={{ width: size, height: size }}
     >
       {show ? (
-        <Image source={source!} onError={() => setFailed(source!.uri)} style={{ width: size, height: size }} />
+        // expo-image la guarda en cache (la version va en la URL) y entra con un fundido corto.
+        <Image source={source!} cachePolicy="memory-disk" transition={150} onError={() => setFailed(source!.uri)} style={{ width: size, height: size }} />
       ) : (
         <Title className="text-accent-ink" style={{ fontSize: size * 0.4 }}>{initials(user.name)}</Title>
       )}

@@ -82,7 +82,7 @@ export function ContributeSheet({ goal, available, color, visible, onClose, onDo
               key={chip.label}
               role="button"
               onPress={() => setText(String(chip.value))}
-              className={`h-11 flex-1 items-center justify-center rounded-full border ${on ? "border-accent-ink bg-accent" : "border-border"}`}
+              className={`min-h-11 flex-1 items-center justify-center rounded-full border ${on ? "border-accent-ink bg-accent" : "border-border"}`}
             >
               <Text weight="medium" className="text-[13px]">{chip.label}</Text>
             </Pressable>

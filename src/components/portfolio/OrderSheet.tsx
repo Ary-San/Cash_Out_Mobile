@@ -27,6 +27,8 @@ import { marketService } from "@/services/marketService"
 import { portfolioService } from "@/services/portfolioService"
 import type { OrderSide, TradeOrder } from "@/types/market"
 import { usePalette } from "@/theme/palette"
+import { TOUCH_SLOP } from "@/lib/touch"
+import { haptics } from "@/lib/haptics"
 
 export interface OrderTarget {
   assetId: number
@@ -91,6 +93,7 @@ function OrderForm({ target, onBusy, onDone }: { target: OrderTarget; onBusy: (b
 
   const switchSide = (next: OrderSide) => {
     if (next === "SELL" && target.held === 0) return
+    if (next !== side) haptics.selection()
     setSide(next)
     setMode(next === "BUY" ? "tokens" : "quantity")
     setText("")
@@ -121,12 +124,14 @@ function OrderForm({ target, onBusy, onDone }: { target: OrderTarget; onBusy: (b
     try {
       const order = await portfolioService.placeOrder({ clientOrderId, assetId: target.assetId, side, quantity: review.quantity })
       if (order.status === "EXECUTED") {
+        haptics.success()
         toast(`${buying ? "Compraste" : "Vendiste"} ${formatQuantity(order.quantity)} ${order.symbol} · ${buying ? "pagaste" : "recibiste"} ${formatTokens(order.tokensMoved)}`)
         onBusy(false)
         onDone(order)
         return
       }
       // Una rechazada ya quedo registrada; el siguiente intento es otra orden.
+      haptics.warning()
       setClientOrderId(uuid())
       setRejection(order.rejectionReason ?? "La orden fue rechazada.")
       wallet.reload()
@@ -148,13 +153,14 @@ function OrderForm({ target, onBusy, onDone }: { target: OrderTarget; onBusy: (b
           const disabled = value === "SELL" && target.held === 0
           return (
             <Pressable
+              hitSlop={TOUCH_SLOP}
               key={value}
               role="radio"
               aria-checked={on}
               aria-disabled={disabled}
               disabled={disabled}
               onPress={() => switchSide(value)}
-              className={`h-10 flex-1 items-center justify-center rounded-full ${on ? "bg-card" : ""} ${disabled ? "opacity-40" : ""}`}
+              className={`min-h-10 flex-1 items-center justify-center rounded-full ${on ? "bg-card" : ""} ${disabled ? "opacity-40" : ""}`}
             >
               <Text weight={on ? "semibold" : "regular"} tone={on ? "default" : "muted"} className="text-sm">
                 {value === "BUY" ? "Comprar" : "Vender"}
@@ -208,6 +214,7 @@ function OrderForm({ target, onBusy, onDone }: { target: OrderTarget; onBusy: (b
             <View role="radiogroup" aria-label="Cómo quieres indicar la compra" className="w-60 flex-row rounded-full bg-muted p-1">
               {(["tokens", "quantity"] as const).map((value) => (
                 <Pressable
+                  hitSlop={TOUCH_SLOP}
                   key={value}
                   role="radio"
                   aria-checked={mode === value}
@@ -216,7 +223,7 @@ function OrderForm({ target, onBusy, onDone }: { target: OrderTarget; onBusy: (b
                     setText("")
                     setFieldError(undefined)
                   }}
-                  className={`h-8 flex-1 items-center justify-center rounded-full ${mode === value ? "bg-card" : ""}`}
+                  className={`min-h-8 flex-1 items-center justify-center rounded-full ${mode === value ? "bg-card" : ""}`}
                 >
                   <Text weight={mode === value ? "semibold" : "regular"} tone={mode === value ? "default" : "muted"} className="text-[13px]">
                     {value === "tokens" ? "En fichas" : unit === "acciones" ? "En acciones" : `En ${unit}`}
@@ -241,7 +248,7 @@ function OrderForm({ target, onBusy, onDone }: { target: OrderTarget; onBusy: (b
                   placeholderTextColor={colors.mutedForeground}
                   accessibilityLabel={mode === "tokens" ? "Fichas a invertir" : "Cantidad"}
                   aria-invalid={Boolean(fieldError)}
-                  className={`h-14 w-full rounded-xl border bg-card px-4 font-sans-semibold text-xl text-foreground ${fieldError ? "border-destructive" : "border-input"}`}
+                  className={`min-h-14 w-full rounded-xl border bg-card px-4 font-sans-semibold text-xl text-foreground ${fieldError ? "border-destructive" : "border-input"}`}
                 />
               </View>
               {allLabel ? (
@@ -251,7 +258,7 @@ function OrderForm({ target, onBusy, onDone }: { target: OrderTarget; onBusy: (b
                     setText(buying ? (Math.floor((balance ?? 0) * 100) / 100).toFixed(2) : String(target.held))
                     setFieldError(undefined)
                   }}
-                  className="h-14 justify-center rounded-xl bg-muted px-3.5 active:opacity-80"
+                  className="min-h-14 justify-center rounded-xl bg-muted px-3.5 active:opacity-80"
                 >
                   <Text weight="medium" className="text-sm">{allLabel}</Text>
                 </Pressable>

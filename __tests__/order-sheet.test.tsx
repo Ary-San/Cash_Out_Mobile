@@ -5,6 +5,7 @@ import { financeService } from "@/services/financeService"
 import { marketService } from "@/services/marketService"
 import { portfolioService } from "@/services/portfolioService"
 import type { TradeOrder } from "@/types/market"
+import * as Haptics from "expo-haptics"
 
 jest.mock("@/services/marketService", () => ({ marketService: { getQuote: jest.fn() } }))
 jest.mock("@/services/financeService", () => ({ financeService: { wallet: jest.fn() } }))
@@ -62,6 +63,8 @@ describe("Hoja de orden", () => {
     await screen.findByText("Revisar compra").catch(() => undefined)
     expect(portfolio.placeOrder).toHaveBeenCalledWith(expect.objectContaining({ assetId: 7, side: "BUY", quantity: 0.19516 }))
     expect(onDone).toHaveBeenCalled()
+    // La compra ejecutada se confirma tambien con una vibracion corta.
+    expect(Haptics.notificationAsync).toHaveBeenCalledWith(Haptics.NotificationFeedbackType.Success)
   })
 
   it("si el backend la rechaza, muestra el motivo y el reintento es otra orden", async () => {
@@ -74,6 +77,7 @@ describe("Hoja de orden", () => {
     await fireEvent.press(screen.getByText("Revisar compra"))
     await fireEvent.press(await screen.findByText("Confirmar compra"))
     expect(await screen.findByText("No te alcanzan las fichas.")).toBeTruthy()
+    expect(Haptics.notificationAsync).toHaveBeenCalledWith(Haptics.NotificationFeedbackType.Warning)
 
     await fireEvent.press(screen.getByText("Revisar compra"))
     await fireEvent.press(await screen.findByText("Confirmar compra"))

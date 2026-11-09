@@ -23,6 +23,7 @@ import { SOURCE_LABEL, completionReward, contributionsByMonth, forecastChart, mo
 import { financeService } from "@/services/financeService"
 import { goalService } from "@/services/goalService"
 import { usePalette } from "@/theme/palette"
+import { haptics } from "@/lib/haptics"
 
 type Panel = "none" | "contribute" | "actions" | "edit" | "delete"
 
@@ -83,6 +84,7 @@ export default function GoalDetailScreen() {
     const after = (goal.accumulatedAmount + amount) / goal.targetAmount
     reloadAll()
     if (after >= 1) {
+      haptics.success()
       setCelebrate({ name: goal.name, target: goal.targetAmount, tokens: completionReward(goal.targetAmount) })
       return
     }
@@ -161,7 +163,7 @@ export default function GoalDetailScreen() {
             const reached = pace.progress * 100 >= m
             const Icon = reached ? Check : Flag
             return (
-              <View key={m} className={`h-14 flex-1 items-center justify-center gap-0.5 rounded-2xl border ${reached ? "border-accent bg-accent" : "border-dashed border-border"}`}>
+              <View key={m} className={`min-h-14 flex-1 items-center justify-center gap-0.5 rounded-2xl border ${reached ? "border-accent bg-accent" : "border-dashed border-border"}`}>
                 <Icon size={16} color={reached ? colors.accentInk : colors.mutedForeground} />
                 <Text weight="semibold" tone={reached ? "accent" : "muted"} className="text-xs">{m} %</Text>
               </View>

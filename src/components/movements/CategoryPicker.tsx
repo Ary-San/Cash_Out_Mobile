@@ -3,6 +3,7 @@ import { Text } from "@/components/ui/Text"
 import { CATEGORY_META } from "@/lib/categories"
 import { usePalette } from "@/theme/palette"
 import { EXPENSE_CATEGORIES, type ExpenseCategory } from "@/types/movements"
+import { TOUCH_SLOP } from "@/lib/touch"
 
 interface CategoryPickerProps {
   value: ExpenseCategory | null
@@ -25,12 +26,13 @@ export function CategoryPicker({ value, onChange, suggested, error }: CategoryPi
           const hinted = !selected && suggested?.has(category)
           return (
             <Pressable
+              hitSlop={TOUCH_SLOP}
               key={category}
               role="radio"
               aria-checked={selected}
               aria-label={label}
               onPress={() => onChange(category)}
-              className={`h-10 flex-row items-center gap-1.5 rounded-full border px-3 ${
+              className={`min-h-10 flex-row items-center gap-1.5 rounded-full border px-3 ${
                 selected ? "border-accent-ink bg-accent" : hinted ? "border-dashed border-accent-ink" : "border-border"
               }`}
             >

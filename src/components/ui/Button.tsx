@@ -19,7 +19,7 @@ export function Button({ label, onPress, loading = false, disabled = false, vari
       disabled={inactive}
       accessibilityRole="button"
       accessibilityState={{ disabled: inactive, busy: loading }}
-      className={`h-12 items-center justify-center rounded-full active:opacity-80 ${surface} ${inactive ? "opacity-50" : ""}`}
+      className={`min-h-12 items-center justify-center rounded-full active:opacity-80 ${surface} ${inactive ? "opacity-50" : ""}`}
     >
       <Text className={`font-sans-medium text-[15px] ${ink}`}>{label}</Text>
     </Pressable>

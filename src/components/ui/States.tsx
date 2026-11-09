@@ -4,6 +4,7 @@ import type { LucideIcon } from "lucide-react-native"
 import { userMessage, type ApiError } from "@/api/errors"
 import { Button } from "@/components/ui/Button"
 import { Text, Title } from "@/components/ui/Text"
+import { useReducedMotion } from "@/hooks/useReducedMotion"
 import { usePalette } from "@/theme/palette"
 
 interface EmptyStateProps {
@@ -46,8 +47,14 @@ export function ErrorState({ error, onRetry }: { error: ApiError; onRetry: () =>
 export function Skeleton({ width = "100%", height = 16 }: { width?: DimensionValue; height?: number }) {
   const [opacity] = useState(() => new Animated.Value(0.5))
   const colors = usePalette()
+  const reduced = useReducedMotion()
 
+  // Con "Reducir movimiento" el bloque queda quieto: igual se entiende que esta cargando.
   useEffect(() => {
+    if (reduced) {
+      opacity.setValue(0.75)
+      return
+    }
     const pulse = Animated.loop(
       Animated.sequence([
         Animated.timing(opacity, { toValue: 1, duration: 700, useNativeDriver: true }),
@@ -56,7 +63,7 @@ export function Skeleton({ width = "100%", height = 16 }: { width?: DimensionVal
     )
     pulse.start()
     return () => pulse.stop()
-  }, [opacity])
+  }, [opacity, reduced])
 
   return (
     <Animated.View

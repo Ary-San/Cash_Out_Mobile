@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { Animated, Easing, Platform, View } from "react-native"
 import Svg, { Circle, Line, Polyline } from "react-native-svg"
 import { Text } from "@/components/ui/Text"
+import { useReducedMotion } from "@/hooks/useReducedMotion"
 import { formatSoles } from "@/lib/format"
 import type { ForecastChart } from "@/lib/goals"
 import { usePalette } from "@/theme/palette"
@@ -15,15 +16,22 @@ const CIRCUMFERENCE = 2 * Math.PI * RADIUS
 export function ProgressRing({ progress, color, label, caption }: { progress: number; color: string; label: string; caption: string }) {
   const colors = usePalette()
   const [offset] = useState(() => new Animated.Value(CIRCUMFERENCE))
+  const reduced = useReducedMotion()
 
+  // Con "Reducir movimiento" el anillo aparece ya lleno hasta el avance, sin recorrerlo.
   useEffect(() => {
+    const toValue = CIRCUMFERENCE * (1 - progress)
+    if (reduced) {
+      offset.setValue(toValue)
+      return
+    }
     Animated.timing(offset, {
-      toValue: CIRCUMFERENCE * (1 - progress),
+      toValue,
       duration: 1000,
       easing: Easing.out(Easing.cubic),
       useNativeDriver: false,
     }).start()
-  }, [offset, progress])
+  }, [offset, progress, reduced])
 
   return (
     <View className="items-center justify-center" style={{ width: SIZE, height: SIZE }} accessible accessibilityLabel={`${label}, ${caption}`}>

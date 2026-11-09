@@ -6,6 +6,13 @@ const WEIGHTS = {
   semibold: "font-sans-semibold",
 } as const
 
+/**
+ * Cuanto puede crecer la letra con el tamano del sistema. Crece de verdad (hasta
+ * 1.6 veces el texto, 1.3 los titulos, que ya son grandes), pero sin romper el layout.
+ */
+export const MAX_TEXT_SCALE = 1.6
+const MAX_TITLE_SCALE = 1.3
+
 const TONES = {
   default: "text-foreground",
   muted: "text-muted-foreground",
@@ -31,7 +38,7 @@ interface TextProps extends NativeTextProps {
  * props y no en className, porque dos clases de color a la vez no se pisan en orden.
  */
 export function Text({ weight = "regular", tone = "default", className = "", ...props }: TextProps) {
-  return <NativeText className={`${WEIGHTS[weight]} ${TONES[tone]} ${className}`} {...props} />
+  return <NativeText maxFontSizeMultiplier={MAX_TEXT_SCALE} className={`${WEIGHTS[weight]} ${TONES[tone]} ${className}`} {...props} />
 }
 
 /** Titulos en Instrument Serif, como en la web. */
@@ -40,6 +47,7 @@ export function Title({ size = "lg", className = "", ...props }: NativeTextProps
   return (
     <NativeText
       accessibilityRole="header"
+      maxFontSizeMultiplier={MAX_TITLE_SCALE}
       className={`font-display text-foreground ${scale} ${className}`}
       {...props}
     />

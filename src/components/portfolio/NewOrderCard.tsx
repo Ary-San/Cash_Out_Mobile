@@ -9,6 +9,7 @@ import { ASSET_TYPE_LABEL, displayName } from "@/lib/market"
 import { marketService } from "@/services/marketService"
 import type { Asset, Position } from "@/types/market"
 import { usePalette } from "@/theme/palette"
+import { TOUCH_SLOP } from "@/lib/touch"
 
 interface NewOrderCardProps {
   positions: Position[] | undefined
@@ -33,7 +34,7 @@ export function NewOrderCard({ positions, onPick }: NewOrderCardProps) {
   return (
     <Card className="gap-3">
       <Text weight="semibold" className="text-[15px]">Nueva orden</Text>
-      <View className="h-12 flex-row items-center gap-2 rounded-xl border border-input bg-card px-3.5">
+      <View className="min-h-12 flex-row items-center gap-2 rounded-xl border border-input bg-card px-3.5">
         <Search size={18} color={colors.mutedForeground} />
         <TextInput
           value={text}
@@ -68,10 +69,11 @@ export function NewOrderCard({ positions, onPick }: NewOrderCardProps) {
             <View role="group" aria-label="Tus activos" className="flex-row flex-wrap gap-1.5">
               {positions.map((position) => (
                 <Pressable
+                  hitSlop={TOUCH_SLOP}
                   key={position.assetId}
                   role="button"
                   onPress={() => onPick({ assetId: position.assetId, symbol: position.symbol, name: position.assetName })}
-                  className="h-9 justify-center rounded-full border border-border px-3 active:bg-muted"
+                  className="min-h-9 justify-center rounded-full border border-border px-3 active:bg-muted"
                 >
                   <Text className="text-[13px]">{position.symbol}</Text>
                 </Pressable>

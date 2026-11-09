@@ -1,5 +1,6 @@
 import { useState, type ComponentRef, type Ref } from "react"
 import { Pressable, Text, TextInput, View, type TextInputProps } from "react-native"
+import { MAX_TEXT_SCALE } from "@/components/ui/Text"
 import { usePalette } from "@/theme/palette"
 
 interface FieldProps extends TextInputProps {
@@ -22,6 +23,7 @@ export function Field({ label, error, secureToggle = false, inputRef, secureText
       >
         <TextInput
           ref={inputRef}
+          maxFontSizeMultiplier={MAX_TEXT_SCALE}
           className="flex-1 px-4 py-3 font-sans text-base text-foreground"
           placeholderTextColor={colors.mutedForeground}
           autoCapitalize="none"

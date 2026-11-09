@@ -51,7 +51,7 @@ export default function LoginScreen() {
     <SafeAreaView className="flex-1 bg-background">
       <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <ScrollView
-          contentContainerClassName="flex-grow justify-center gap-7 px-6 py-8"
+          contentContainerClassName="w-full max-w-[480px] flex-grow justify-center gap-7 self-center px-6 py-8"
           keyboardShouldPersistTaps="handled"
         >
           <View className="gap-2">

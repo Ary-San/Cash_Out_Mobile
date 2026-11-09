@@ -27,6 +27,7 @@ import { marketService } from "@/services/marketService"
 import { portfolioService } from "@/services/portfolioService"
 import type { Position, TradeOrder } from "@/types/market"
 import { usePalette } from "@/theme/palette"
+import { TOUCH_SLOP } from "@/lib/touch"
 
 const STEP = 30
 
@@ -106,6 +107,7 @@ export function OrdersSection({ version, positions, onTrade }: OrdersSectionProp
           <View role="radiogroup" aria-label="Periodo" className="w-[190px] flex-row rounded-full bg-muted p-1">
             {ORDER_PERIODS.map((option) => (
               <Pressable
+                hitSlop={TOUCH_SLOP}
                 key={option.value}
                 role="radio"
                 aria-checked={period === option.value}
@@ -113,7 +115,7 @@ export function OrdersSection({ version, positions, onTrade }: OrdersSectionProp
                   setPeriod(option.value)
                   setLimit(STEP)
                 }}
-                className={`h-8 flex-1 items-center justify-center rounded-full ${period === option.value ? "bg-card" : ""}`}
+                className={`min-h-8 flex-1 items-center justify-center rounded-full ${period === option.value ? "bg-card" : ""}`}
               >
                 <Text weight={period === option.value ? "semibold" : "regular"} tone={period === option.value ? "default" : "muted"} className="text-xs">
                   {option.label}
@@ -161,6 +163,7 @@ export function OrdersSection({ version, positions, onTrade }: OrdersSectionProp
               const count = periodOrders?.filter((order) => matchesKind(order, option.value)).length
               return (
                 <Pressable
+                  hitSlop={TOUCH_SLOP}
                   key={option.value}
                   role="button"
                   aria-pressed={on}
@@ -168,7 +171,7 @@ export function OrdersSection({ version, positions, onTrade }: OrdersSectionProp
                     setKind(option.value)
                     setLimit(STEP)
                   }}
-                  className={`h-9 flex-row items-center gap-1.5 rounded-full border px-3 ${on ? "border-accent-ink bg-accent" : "border-border bg-card"}`}
+                  className={`min-h-9 flex-row items-center gap-1.5 rounded-full border px-3 ${on ? "border-accent-ink bg-accent" : "border-border bg-card"}`}
                 >
                   <Text weight={on ? "semibold" : "regular"} className="text-[13px]">{option.label}</Text>
                   {count !== undefined ? <Text tone="muted" className="text-[13px]">{count}</Text> : null}
@@ -176,7 +179,7 @@ export function OrdersSection({ version, positions, onTrade }: OrdersSectionProp
               )
             })}
           </View>
-          <View className="h-11 flex-row items-center gap-2 rounded-xl border border-input bg-card px-3.5">
+          <View className="min-h-11 flex-row items-center gap-2 rounded-xl border border-input bg-card px-3.5">
             <Search size={16} color={colors.mutedForeground} />
             <TextInput
               value={text}
@@ -197,13 +200,14 @@ export function OrdersSection({ version, positions, onTrade }: OrdersSectionProp
           <View className="items-center gap-2.5 border-t border-border px-4 py-7">
             <Text weight="semibold">No hay órdenes con estos filtros</Text>
             <Pressable
+              hitSlop={TOUCH_SLOP}
               role="button"
               onPress={() => {
                 setPeriod("todo")
                 setKind("todas")
                 setText("")
               }}
-              className="h-10 justify-center rounded-full border border-border px-4 active:opacity-70"
+              className="min-h-10 justify-center rounded-full border border-border px-4 active:opacity-70"
             >
               <Text weight="medium" className="text-sm">Ver todas</Text>
             </Pressable>
@@ -225,7 +229,7 @@ export function OrdersSection({ version, positions, onTrade }: OrdersSectionProp
         )}
         {visible && visible.length > limit ? (
           <View className="border-t border-border p-3">
-            <Pressable role="button" onPress={() => setLimit((n) => n + STEP)} className="h-10 items-center justify-center rounded-full border border-border active:opacity-70">
+            <Pressable hitSlop={TOUCH_SLOP} role="button" onPress={() => setLimit((n) => n + STEP)} className="min-h-10 items-center justify-center rounded-full border border-border active:opacity-70">
               <Text weight="medium" className="text-sm">Ver más órdenes</Text>
             </Pressable>
           </View>

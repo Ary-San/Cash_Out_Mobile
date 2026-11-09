@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react-native"
 import { ApiError } from "@/api/errors"
 import { Segmented } from "@/components/ui/Segmented"
 import { ErrorState } from "@/components/ui/States"
+import { Text, Title } from "@/components/ui/Text"
 
 const OPTIONS = [
   { value: "light", label: "Claro" },
@@ -36,5 +37,13 @@ describe("ErrorState", () => {
 
     expect(screen.getByText(/No tienes permiso/)).toBeOnTheScreen()
     expect(screen.queryByRole("button", { name: "Reintentar" })).toBeNull()
+  })
+})
+
+describe("Letra del sistema", () => {
+  it("el texto crece con el tamano del sistema, pero con tope para no romper el layout", async () => {
+    await render(<><Title>Movimientos</Title><Text>Tus gastos</Text></>)
+    expect(screen.getByText("Movimientos").props.maxFontSizeMultiplier).toBe(1.3)
+    expect(screen.getByText("Tus gastos").props.maxFontSizeMultiplier).toBe(1.6)
   })
 })
