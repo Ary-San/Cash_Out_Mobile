@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from "react"
 import { Pressable, View } from "react-native"
 import { router, useFocusEffect } from "expo-router"
 import { KeyRound, Mail, Smartphone, Trash2, UserRound } from "lucide-react-native"
+import { BiometricsRow } from "@/components/profile/BiometricsRow"
 import { DeleteAccountSheet } from "@/components/profile/DeleteAccountSheet"
 import { SettingsGroup, SettingsRow } from "@/components/profile/SettingsGroup"
 import { UserAvatar } from "@/components/profile/UserAvatar"
@@ -88,6 +89,7 @@ export default function ProfileScreen() {
           ) : (
             <SettingsRow icon={KeyRound} label="Contraseña" description="Al cambiarla, se cierran tus otras sesiones" onPress={() => router.push("/settings/password")} />
           )}
+          <BiometricsRow />
         </SettingsGroup>
 
         {student ? (

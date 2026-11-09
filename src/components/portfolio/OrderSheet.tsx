@@ -10,6 +10,7 @@ import { useToast } from "@/components/ui/Toast"
 import { useApiQuery } from "@/hooks/useApiQuery"
 import { usePolling } from "@/hooks/usePolling"
 import { toCents } from "@/lib/amount"
+import { confirmWithBiometrics } from "@/lib/biometrics"
 import {
   changeTone,
   formatQuantity,
@@ -113,6 +114,8 @@ function OrderForm({ target, onBusy, onDone }: { target: OrderTarget; onBusy: (b
 
   const confirm = async () => {
     if (!review) return
+    // Con la biometria activa, una orden con fichas se confirma con la huella.
+    if (!(await confirmWithBiometrics(buying ? "Confirma la compra" : "Confirma la venta"))) return
     setPlacing(true)
     onBusy(true)
     try {

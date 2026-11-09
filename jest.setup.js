@@ -16,3 +16,14 @@ jest.mock("react-native-reanimated", () => require("react-native-reanimated/mock
 
 // AsyncStorage es nativo: su mock oficial guarda en memoria.
 jest.mock("@react-native-async-storage/async-storage", () => require("@react-native-async-storage/async-storage/jest/async-storage-mock"))
+
+// La biometria es nativa: por defecto hay lector y huella registrada, y se acepta.
+jest.mock("@react-native-community/netinfo", () => require("@react-native-community/netinfo/jest/netinfo-mock.js"))
+
+jest.mock("expo-local-authentication", () => ({
+  AuthenticationType: { FINGERPRINT: 1, FACIAL_RECOGNITION: 2 },
+  hasHardwareAsync: jest.fn().mockResolvedValue(true),
+  isEnrolledAsync: jest.fn().mockResolvedValue(true),
+  supportedAuthenticationTypesAsync: jest.fn().mockResolvedValue([1]),
+  authenticateAsync: jest.fn().mockResolvedValue({ success: true }),
+}))

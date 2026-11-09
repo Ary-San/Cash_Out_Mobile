@@ -8,6 +8,7 @@ import { Sheet } from "@/components/ui/Sheet"
 import { Text } from "@/components/ui/Text"
 import { useToast } from "@/components/ui/Toast"
 import { useAuth } from "@/hooks/useAuth"
+import { confirmWithBiometrics } from "@/lib/biometrics"
 import { DELETE_WORD } from "@/lib/profile"
 import { userService } from "@/services/userService"
 
@@ -30,6 +31,7 @@ export function DeleteAccountSheet({ visible, onClose }: { visible: boolean; onC
   }
 
   const remove = async () => {
+    if (!(await confirmWithBiometrics("Confirma que quieres eliminar tu cuenta"))) return
     setBusy(true)
     setError(undefined)
     try {

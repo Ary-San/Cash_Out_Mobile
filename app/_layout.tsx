@@ -9,11 +9,15 @@ import { useColorScheme } from "nativewind"
 import { Geist_400Regular, Geist_500Medium, Geist_600SemiBold } from "@expo-google-fonts/geist"
 import { InstrumentSerif_400Regular, InstrumentSerif_400Regular_Italic } from "@expo-google-fonts/instrument-serif"
 import { useFonts } from "expo-font"
+import { LockScreen } from "@/components/auth/LockScreen"
 import { Button } from "@/components/ui/Button"
+import { OfflineBanner } from "@/components/ui/OfflineBanner"
 import { Text, Title } from "@/components/ui/Text"
 import { ToastProvider } from "@/components/ui/Toast"
 import { AuthProvider } from "@/contexts/AuthProvider"
+import { useAppLock } from "@/hooks/useAppLock"
 import { useAuth } from "@/hooks/useAuth"
+import { onReconnect } from "@/lib/network"
 import { usePalette } from "@/theme/palette"
 import { applyStoredTheme } from "@/theme/themePreference"
 
@@ -23,6 +27,7 @@ applyStoredTheme()
 
 function RootNavigator() {
   const { status, retryRestore } = useAuth()
+  const lock = useAppLock(status)
   const colors = usePalette()
   const [fontsLoaded, fontError] = useFonts({
     Geist_400Regular,
@@ -38,6 +43,9 @@ function RootNavigator() {
     if (ready) void SplashScreen.hideAsync()
   }, [ready])
 
+  // Sin red al abrir: la sesion guardada se restaura sola cuando vuelve.
+  useEffect(() => (status === "unavailable" ? onReconnect(retryRestore) : undefined), [status, retryRestore])
+
   if (!ready) return null
 
   if (status === "unavailable") {
@@ -50,20 +58,30 @@ function RootNavigator() {
         <View className="w-full">
           <Button label="Reintentar" onPress={retryRestore} />
         </View>
+        <Text tone="muted" className="text-center text-xs">Si era la red, entramos solos apenas vuelva.</Text>
       </View>
     )
   }
 
   const signedIn = status === "authenticated"
   return (
-    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
-      <Stack.Protected guard={signedIn}>
-        <Stack.Screen name="(app)" />
-      </Stack.Protected>
-      <Stack.Protected guard={!signedIn}>
-        <Stack.Screen name="(auth)" />
-      </Stack.Protected>
-    </Stack>
+    <View className="flex-1">
+      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
+        <Stack.Protected guard={signedIn}>
+          <Stack.Screen name="(app)" />
+        </Stack.Protected>
+        <Stack.Protected guard={!signedIn}>
+          <Stack.Screen name="(auth)" />
+        </Stack.Protected>
+      </Stack>
+      {/* Encima de la navegacion: al desbloquear se sigue en la misma pantalla. */}
+      {lock.locked ? (
+        <View className="absolute inset-0">
+          <LockScreen onUnlock={lock.unlock} />
+        </View>
+      ) : null}
+      <OfflineBanner />
+    </View>
   )
 }
 
