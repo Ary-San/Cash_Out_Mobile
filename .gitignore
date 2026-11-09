@@ -44,3 +44,6 @@ example
 /android
 
 .claude/
+
+# graphify
+graphify-out/
