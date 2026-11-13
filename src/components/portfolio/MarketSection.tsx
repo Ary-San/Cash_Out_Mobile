@@ -91,6 +91,7 @@ export function MarketSection({ positions }: MarketSectionProps) {
     return assets.map((asset, i) => ({ asset, quote: quotes.find((quote) => quote.symbol === asset.symbol), points: histories[i] }))
   })
 
+  const toggleFavorite = (asset: Asset) => void watchlist.toggle(asset)
   const ids = [...(rows ?? []), ...(watchlist.assets ?? [])].map((asset) => asset.id)
   const quotes = useApiQuery(["asset-quotes", ids], (signal) => marketService.quotes(ids, signal))
   const quoteOf = (asset: Asset) => quotes.data?.find((quote) => quote.symbol === asset.symbol)
@@ -143,7 +144,7 @@ export function MarketSection({ positions }: MarketSectionProps) {
         ) : (
           <View className="border-t border-border">
             {watchlist.assets.map((asset, i) => (
-              <AssetRow key={asset.id} first={i === 0} asset={asset} quote={quoteOf(asset)} held={heldIds.includes(asset.id)} favorite onToggleFavorite={() => void watchlist.toggle(asset)} />
+              <AssetRow key={asset.id} first={i === 0} asset={asset} quote={quoteOf(asset)} held={heldIds.includes(asset.id)} favorite onToggleFavorite={toggleFavorite} />
             ))}
           </View>
         )}
@@ -209,7 +210,7 @@ export function MarketSection({ positions }: MarketSectionProps) {
                 quote={quoteOf(asset)}
                 held={heldIds.includes(asset.id)}
                 favorite={watchlist.isFavorite(asset.id)}
-                onToggleFavorite={() => void watchlist.toggle(asset)}
+                onToggleFavorite={toggleFavorite}
               />
             ))}
             {!mine && hasMore ? (

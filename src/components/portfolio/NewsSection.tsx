@@ -72,6 +72,7 @@ export function NewsSection({ positions, onTrade }: NewsSectionProps) {
           </View>
           {trending.data.slice(0, 5).map((asset) => (
             <Pressable
+              hitSlop={TOUCH_SLOP}
               key={asset.assetId}
               role="button"
               aria-label={`${asset.symbol}: ${asset.mentions} noticias. Ver sus noticias`}
@@ -113,7 +114,7 @@ export function NewsSection({ positions, onTrade }: NewsSectionProps) {
         {symbol ? (
           <View className="min-h-9 flex-row items-center gap-1 rounded-full border border-accent-ink bg-accent pl-3 pr-1">
             <Text className="text-[13px]">Símbolo: <Text weight="semibold" className="text-[13px]">{symbol}</Text></Text>
-            <Pressable role="button" aria-label="Quitar el filtro de símbolo" onPress={() => setSymbol(undefined)} className="size-7 items-center justify-center rounded-full">
+            <Pressable hitSlop={8} role="button" aria-label="Quitar el filtro de símbolo" onPress={() => setSymbol(undefined)} className="size-7 items-center justify-center rounded-full">
               <X size={14} color={colors.foreground} />
             </Pressable>
           </View>
@@ -138,30 +139,9 @@ export function NewsSection({ positions, onTrade }: NewsSectionProps) {
           {groupNewsByDay(items).map((group) => (
             <View key={group.label}>
               <Text tone="muted" className="px-4 pb-1.5 pt-3 text-[11px] uppercase tracking-widest">{group.label}</Text>
-              {group.items.map((news) => {
-                const isSaved = saved.isSaved(news.id)
-                return (
-                  <View key={news.id} className="gap-2 border-t border-border px-4 pb-2.5 pt-3">
-                    <Pressable role="button" onPress={() => setReading(news)} className="gap-1.5 active:opacity-70">
-                      {news.assets.length > 0 ? (
-                        <View className="flex-row flex-wrap gap-1.5">
-                          {news.assets.slice(0, 4).map((asset) => (
-                            <View key={asset.assetId} className="rounded-full bg-muted px-2 py-0.5">
-                              <Text weight="medium" className="text-[11px]">{asset.symbol.replace(/-USD$/, "")}</Text>
-                            </View>
-                          ))}
-                        </View>
-                      ) : null}
-                      <Text weight="semibold" className="text-[15px] leading-5">{news.headline}</Text>
-                      <Text tone="muted" className="text-xs">{sourceLabel(news.source)} · {formatNewsStamp(news)}</Text>
-                    </Pressable>
-                    <Pressable hitSlop={TOUCH_SLOP} role="button" aria-pressed={isSaved} onPress={() => saved.toggle(news)} className="min-h-8 flex-row items-center gap-1.5 self-start">
-                      <Star size={15} color={colors.mutedForeground} fill={isSaved ? colors.mutedForeground : "transparent"} />
-                      <Text weight="medium" tone="muted" className="text-[13px]">{isSaved ? "Guardada" : "Guardar"}</Text>
-                    </Pressable>
-                  </View>
-                )
-              })}
+              {group.items.map((news) => (
+                <NewsRow key={news.id} news={news} saved={saved.isSaved(news.id)} onRead={setReading} onToggleSaved={saved.toggle} />
+              ))}
             </View>
           ))}
           {!onlySaved && feed.hasMore ? (
@@ -237,5 +217,38 @@ function EmptyNews({ onlySaved, symbol, scope, hasPositions, onReset }: { onlySa
         </Pressable>
       ) : null}
     </Card>
+  )
+}
+
+interface NewsRowProps {
+  news: NewsItem
+  saved: boolean
+  onRead: (news: NewsItem) => void
+  onToggleSaved: (news: NewsItem) => void
+}
+
+/** Una noticia de la lista. Va aparte para que "Ver mas" no vuelva a dibujar las que ya estaban. */
+function NewsRow({ news, saved, onRead, onToggleSaved }: NewsRowProps) {
+  const colors = usePalette()
+  return (
+    <View className="gap-2 border-t border-border px-4 pb-2.5 pt-3">
+      <Pressable role="button" onPress={() => onRead(news)} className="gap-1.5 active:opacity-70">
+        {news.assets.length > 0 ? (
+          <View className="flex-row flex-wrap gap-1.5">
+            {news.assets.slice(0, 4).map((asset) => (
+              <View key={asset.assetId} className="rounded-full bg-muted px-2 py-0.5">
+                <Text weight="medium" className="text-[11px]">{asset.symbol.replace(/-USD$/, "")}</Text>
+              </View>
+            ))}
+          </View>
+        ) : null}
+        <Text weight="semibold" className="text-[15px] leading-5">{news.headline}</Text>
+        <Text tone="muted" className="text-xs">{sourceLabel(news.source)} · {formatNewsStamp(news)}</Text>
+      </Pressable>
+      <Pressable hitSlop={TOUCH_SLOP} role="button" aria-pressed={saved} onPress={() => onToggleSaved(news)} className="min-h-8 flex-row items-center gap-1.5 self-start">
+        <Star size={15} color={colors.mutedForeground} fill={saved ? colors.mutedForeground : "transparent"} />
+        <Text weight="medium" tone="muted" className="text-[13px]">{saved ? "Guardada" : "Guardar"}</Text>
+      </Pressable>
+    </View>
   )
 }

@@ -222,7 +222,7 @@ export function OrdersSection({ version, positions, onTrade }: OrdersSectionProp
                 </Text>
               </View>
               {day.orders.map((order, i) => (
-                <OrderRow key={order.id} order={order} first={i === 0} onPress={() => setPicked(order)} />
+                <OrderRow key={order.id} order={order} first={i === 0} onPress={setPicked} />
               ))}
             </View>
           ))
@@ -241,7 +241,8 @@ export function OrdersSection({ version, positions, onTrade }: OrdersSectionProp
   )
 }
 
-function OrderRow({ order, first, onPress }: { order: TradeOrder; first: boolean; onPress: () => void }) {
+// onPress recibe la orden: la lista pasa siempre la misma funcion y "Ver mas" no vuelve a dibujar las filas que ya estaban.
+function OrderRow({ order, first, onPress }: { order: TradeOrder; first: boolean; onPress: (order: TradeOrder) => void }) {
   const colors = usePalette()
   const tokens = signedTokens(order)
   const done = order.status === "EXECUTED"
@@ -251,7 +252,7 @@ function OrderRow({ order, first, onPress }: { order: TradeOrder; first: boolean
     <Pressable
       role="button"
       aria-label={`${ORDER_SIDE_LABEL[order.side]} de ${order.symbol}, ${ORDER_STATUS_LABEL[order.status].toLowerCase()}. Ver comprobante`}
-      onPress={onPress}
+      onPress={() => onPress(order)}
       className={`gap-1.5 px-4 py-3 active:bg-muted ${first ? "" : "border-t border-border"}`}
     >
       <View className="flex-row items-center gap-2.5">

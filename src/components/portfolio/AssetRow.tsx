@@ -11,7 +11,8 @@ interface AssetRowProps {
   quote: AssetQuote | undefined
   held: boolean
   favorite: boolean
-  onToggleFavorite: () => void
+  /** Recibe el activo: asi la lista pasa siempre la misma funcion y las filas que no cambian no se vuelven a dibujar. */
+  onToggleFavorite: (asset: Asset) => void
   first?: boolean
 }
 
@@ -52,7 +53,7 @@ export function AssetRow({ asset, quote, held, favorite, onToggleFavorite, first
         role="button"
         aria-pressed={favorite}
         aria-label={favorite ? `Quitar ${asset.symbol} de favoritos` : `Agregar ${asset.symbol} a favoritos`}
-        onPress={onToggleFavorite}
+        onPress={() => onToggleFavorite(asset)}
         className="size-11 items-center justify-center"
       >
         <Star size={20} color={favorite ? colors.accentInk : colors.mutedForeground} fill={favorite ? colors.accentInk : "transparent"} />

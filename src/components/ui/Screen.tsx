@@ -93,7 +93,7 @@ function ScreenHeader({ title, subtitle, action, back }: Pick<ScreenProps, "titl
   return (
     <>
       {back ? (
-        <Pressable role="button" aria-label="Volver" onPress={() => router.back()} className="-ml-2 flex-row items-center self-start p-2">
+        <Pressable role="button" aria-label="Volver" onPress={() => router.back()} className="-ml-2 min-h-11 flex-row items-center self-start px-2">
           <ChevronLeft size={22} color={colors.foreground} />
           <Text className="text-[15px]">Volver</Text>
         </Pressable>

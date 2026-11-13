@@ -60,7 +60,7 @@ export function DraftCard({ draft, onDone }: { draft: Draft; onDone: (saved: boo
             onChange={(kind) => setForm({ ...form, kind, category: form.category ?? draft.category ?? "OTHER" })}
           />
         </View>
-        <Pressable role="button" aria-label="Descartar esta tarjeta" onPress={() => onDone(false)} className="p-2">
+        <Pressable role="button" aria-label="Descartar esta tarjeta" onPress={() => onDone(false)} className="size-11 items-center justify-center">
           <X size={20} color={colors.mutedForeground} />
         </Pressable>
       </View>
