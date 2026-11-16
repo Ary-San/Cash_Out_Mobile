@@ -209,7 +209,14 @@ export default function GoalDetailScreen() {
       {inProgress || goal.status === "EXPIRED" ? (
         <View className="absolute inset-x-0 bottom-0 bg-background px-5 pb-6 pt-3">
           {inProgress ? (
-            <Button label="Aportar" onPress={() => setPanel("contribute")} />
+            <View className="flex-row gap-2.5">
+              <View className="flex-1">
+                <Button label="Proyectar" variant="outline" onPress={() => router.push({ pathname: "/projection", params: { goalId: String(goal.id) } })} />
+              </View>
+              <View className="flex-1">
+                <Button label="Aportar" onPress={() => setPanel("contribute")} />
+              </View>
+            </View>
           ) : (
             <Button label="Crear una meta nueva" variant="outline" onPress={() => router.navigate("/goals")} />
           )}

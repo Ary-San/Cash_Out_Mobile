@@ -30,6 +30,8 @@ export function Screen({ children, onRefresh, refreshing = false, back = false, 
           // En tablet el contenido no se estira: queda centrado con un ancho de lectura.
           contentContainerClassName="w-full max-w-[640px] gap-5 self-center px-5 pb-8 pt-4"
           keyboardShouldPersistTaps="handled"
+          // En iPhone el teclado numerico no tiene tecla para cerrarse: baja al deslizar.
+          keyboardDismissMode="on-drag"
           refreshControl={
             onRefresh ? (
               <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.mutedForeground} />
@@ -70,6 +72,8 @@ export function ListScreen<T>({ children, items, keyExtractor, renderItem, foote
           renderItem={renderItem}
           contentContainerClassName="w-full max-w-[640px] self-center px-5 pb-8 pt-4"
           keyboardShouldPersistTaps="handled"
+          // En iPhone el teclado numerico no tiene tecla para cerrarse: baja al deslizar.
+          keyboardDismissMode="on-drag"
           ListHeaderComponent={
             <View className={`gap-5 ${items.length > 0 ? "pb-5" : ""}`}>
               <ScreenHeader back={back} {...header} />

@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from "react"
 import { Pressable, View } from "react-native"
 import { router, useFocusEffect } from "expo-router"
-import { Plus } from "lucide-react-native"
+import { LineChart as ChartIcon, Plus } from "lucide-react-native"
 import { GoalCard } from "@/components/goals/GoalCard"
 import { GoalFormSheet } from "@/components/goals/GoalFormSheet"
 import { Card } from "@/components/ui/Card"
@@ -64,6 +64,17 @@ export default function GoalsScreen() {
           reloadSavings()
         }}
         refreshing={goals.isRefreshing}
+        action={
+          <Pressable
+            role="button"
+            aria-label="Proyectar tu ahorro"
+            onPress={() => router.push("/projection")}
+            className="min-h-11 flex-row items-center gap-1.5 rounded-full border border-border px-3.5 active:opacity-70"
+          >
+            <ChartIcon size={18} color={colors.foreground} />
+            <Text weight="medium" className="text-sm">Proyectar</Text>
+          </Pressable>
+        }
       >
         <View className="flex-row items-center justify-between">
           <Text tone="muted" className="text-[13px]">Ver por</Text>
