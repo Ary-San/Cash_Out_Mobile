@@ -218,9 +218,8 @@ export default function ProjectionScreen() {
                   { values: curve.simple, color: colors.primary },
                   { values: curve.contributed, color: colors.mutedForeground, dashed: true },
                 ]}
-                // Escala visible: el monto final arriba, cero abajo y la linea de lo aportado como referencia.
-                extremes={{ top: formatSoles(curve.compound[curve.compound.length - 1]), bottom: formatSoles(0) }}
-                guide={{ value: curve.contributed[curve.contributed.length - 1], label: "Aportado" }}
+                // La escala parte del valor mas bajo de las curvas (el capital inicial), no de cero: ese es el piso que se rotula.
+                extremes={{ top: formatSoles(curve.compound[curve.compound.length - 1]), bottom: formatSoles(curve.contributed[0]) }}
                 accessibilityLabel={`Gráfico de crecimiento en ${formatTerm(curve.compound.length - 1)}: compuesto, simple y lo aportado`}
               />
             ) : null}
