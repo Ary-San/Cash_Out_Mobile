@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react"
-import { StyleSheet, View, useWindowDimensions, type LayoutChangeEvent } from "react-native"
-import { Canvas, Fill, LinearGradient, Rect, Shader, Skia, useClock, vec } from "@shopify/react-native-skia"
+import { Platform, StyleSheet, View, useWindowDimensions, type LayoutChangeEvent } from "react-native"
+import { Canvas, Fill, LinearGradient, Rect, Shader, Skia, useClock, vec, type SkRuntimeEffect } from "@shopify/react-native-skia"
 import { useDerivedValue, useSharedValue } from "react-native-reanimated"
 import { useColorScheme } from "nativewind"
 import { useReducedMotion } from "@/hooks/useReducedMotion"
@@ -8,7 +8,7 @@ import { palette, silk } from "@/theme/palette"
 
 // El shader de seda de la web (SilkWaves) pasado a SkSL: las mismas capas de plegado y la misma rampa de color.
 // Si el dispositivo no puede compilar el shader queda en null y la pantalla usa el fondo liso.
-const SOURCE = Skia.RuntimeEffect.Make(`
+const SKSL = `
 uniform float2 uResolution;
 uniform float uTime;
 uniform float3 c0; uniform float3 c1; uniform float3 c2; uniform float3 c3;
@@ -42,7 +42,24 @@ half4 main(float2 fragCoord) {
   fold = pow(fold, 1.4);
   return half4(ramp(fold), 1.0);
 }
-`)
+`
+
+let effect: SkRuntimeEffect | null | undefined
+
+/**
+ * El shader se compila la primera vez que se dibuja, no al importar el archivo: en la web (y al
+ * exportar con EAS, que tambien arma la web) Skia no existe, y compilarlo al importar rompia el export.
+ * Si no se puede compilar, la bienvenida queda con el fondo liso.
+ */
+function silkEffect(): SkRuntimeEffect | null {
+  if (effect !== undefined) return effect
+  try {
+    effect = Platform.OS === "web" ? null : Skia.RuntimeEffect.Make(SKSL)
+  } catch {
+    effect = null
+  }
+  return effect
+}
 
 function rgb(hex: string): [number, number, number] {
   const n = Number.parseInt(hex.slice(1), 16)
@@ -80,13 +97,14 @@ export function SilkBackground({ active = true }: { active?: boolean }) {
   }, [width, height, reduced, active, colors])
   const background = palette[theme].background
 
-  if (!SOURCE) return null
+  const source = silkEffect()
+  if (!source) return null
   return (
     // Skia no acepta onLayout en el Canvas con la nueva arquitectura: lo mide el View que lo envuelve.
     <View style={StyleSheet.absoluteFill} pointerEvents="none" onLayout={onLayout}>
       <Canvas style={StyleSheet.absoluteFill}>
         <Fill>
-          <Shader source={SOURCE} uniforms={uniforms} />
+          <Shader source={source} uniforms={uniforms} />
         </Fill>
         {/* El velo: la seda se apaga hacia abajo y deja el titular y los botones sobre el fondo. */}
         {/* Con margen de sobra abajo: si el lienzo mide mas que la ventana, la seda no asoma bajo los botones. */}
