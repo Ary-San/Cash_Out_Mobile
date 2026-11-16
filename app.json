@@ -87,7 +87,7 @@
     },
     "owner": "arysanchez",
     "runtimeVersion": {
-      "policy": "appVersion"
+      "policy": "sdkVersion"
     },
     "updates": {
       "url": "https://u.expo.dev/5930c07c-ca42-46f2-bec7-68cec6413b5f"
