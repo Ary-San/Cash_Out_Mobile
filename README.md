@@ -1,56 +1,106 @@
-# Welcome to your Expo app 👋
+# Cash-Out · App móvil
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+App de finanzas personales para jóvenes: registra lo que entra y sale (en soles), ponle metas a tu ahorro y practica invertir con **fichas** sobre precios reales, sin arriesgar dinero. Es el cliente móvil del proyecto Cash-Out (CS2031 · Desarrollo Basado en Plataformas, UTEC).
 
-## Get started
+- **Web:** https://cash-out-front-web.vercel.app
+- **API:** `https://cash-out-front-web.vercel.app/api/v1` (backend Spring Boot en AWS, detrás del proxy HTTPS de Vercel)
+- **Publicación:** EAS Update, canal `production`, se abre en **Expo Go** (SDK 58)
 
-1. Install dependencies
+## Qué hace
 
-   ```bash
-   npm install
-   ```
+| Pantalla | Funciones |
+|---|---|
+| Bienvenida | Seda animada (shader Skia), una meta de ejemplo que se convierte en fichas, crear cuenta o entrar |
+| Resumen | Disponible, fichas, el mes por categorías, metas y últimos movimientos |
+| Movimientos | Registrar con una frase ("almuerzo 15 soles"), con el QR de una boleta SUNAT o a mano; lista virtualizada con filtros |
+| Metas | Crear, aportar, pronóstico de llegada, celebración al cumplir (+ fichas) |
+| Proyecciones | Interés simple vs compuesto, tasas de referencia, escenarios guardados y "proyectar esta meta" |
+| Portafolio | Mercado (acciones de EE. UU. y cripto), órdenes con fichas, posiciones, noticias, favoritos |
+| Perfil | Datos y foto, contraseña, biometría, tema, correos del banco (Gmail), atajo de iPhone, eliminar cuenta |
 
-2. Start the app
+## Tecnologías
 
-   ```bash
-   npx expo start
-   ```
+### Base
+- **Expo SDK 58** · **React Native 0.88** · **React 19.3** · **TypeScript**
+- **expo-router**: rutas por archivos (`app/`), pestañas y pantallas apiladas, rutas protegidas por sesión
+- **React Compiler** activo (memorización automática)
 
-In the output, you'll find options to open the app in a
+### Diseño
+- **NativeWind 4 + Tailwind CSS 3.4**: estilos con clases, los mismos tokens que la web
+- **Tokens de color** en `global.css` y `src/theme/palette.ts`, con **modo claro y oscuro**
+- **Tipografía** con `@expo-google-fonts`: Geist (texto), Instrument Serif (títulos) y Radio Canada Big (logotipo)
+- **lucide-react-native** (íconos), **expo-image** (foto de perfil con caché)
+- **react-native-svg**: gráficos propios (líneas del portafolio y de proyecciones, anillos de metas)
+- **@shopify/react-native-skia**: la seda animada de la bienvenida
+- **react-native-reanimated 4**: hojas, transiciones y la animación de la bienvenida
+- **expo-haptics**: vibración al confirmar órdenes, cumplir metas y desbloquear
+- Componentes propios en `src/components/ui/`: `Button`, `Card`, `Field`, `Sheet`, `Segmented`, `Screen`/`ListScreen`, `Toast`, `States`, `OfflineBanner`
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### Datos y estado
+- **axios** con un cliente central (`src/api/client.ts`): `baseURL`, `Authorization: Bearer`, renovación automática del token ante un 401 y timeout de 15 s
+- **Context + custom hooks**: `AuthProvider`/`useAuth`, `useApiQuery` (carga, error, cancelación con `AbortController` y reintento), `usePolling`, `useLivePrices` (SSE)
+- **zod** + **react-hook-form**: validación antes de enviar, con las mismas reglas que el backend
+- **@react-native-community/netinfo**: aviso sin conexión y recarga automática al volver la red
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+### Sensores
+- **Cámara** (`expo-camera`): leer el QR de las boletas SUNAT; **expo-image-picker** para la foto de perfil
+- **Lector de huella o rostro** (`expo-local-authentication`): entrar a la app y confirmar órdenes y la eliminación de la cuenta
 
-## Get a fresh project
+### Seguridad
+- Token de acceso solo en memoria; refresh token en **expo-secure-store** (Keystore / Keychain)
+- Bloqueo biométrico al abrir y al volver tras 2 minutos en segundo plano
+- Órdenes idempotentes (`clientOrderId`) y confirmación de acciones destructivas
+- Sin secretos en la app: la única variable es la URL pública de la API
 
-When you're ready, run:
+### Accesibilidad
+- Roles y etiquetas en español para lectores de pantalla, áreas táctiles de 44 pt
+- Letra del sistema con tope (1,6× texto, 1,3× títulos) y alturas mínimas en vez de fijas
+- Respeta "Reducir movimiento"; ancho máximo en tablet
 
-```bash
-npm run reset-project
+### Calidad
+- **Jest 30** + **React Native Testing Library 14** (90 pruebas), **ESLint** (`expo lint`) y `tsc`
+
+## Estructura
+
+```
+app/                 rutas (expo-router)
+  (auth)/            bienvenida, login, registro
+  (app)/(tabs)/      resumen, movimientos, metas, portafolio, perfil
+  (app)/...          detalle de meta, activo, movimiento, proyección, ajustes, escáner
+src/
+  api/               cliente axios, errores, almacenamiento de tokens
+  services/          una capa por recurso del backend
+  hooks/             lógica reutilizable (consultas, polling, biometría, movimiento reducido)
+  contexts/          sesión
+  components/        UI por dominio y componentes base en ui/
+  lib/               reglas puras (montos, fechas, proyecciones, validación)
+  theme/             paleta y preferencia de tema
+  types/             tipos de las respuestas del backend
+__tests__/           pruebas de pantallas y flujos
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Correr en local
 
-### Other setup steps
+```bash
+npm install
+cp .env.example .env    # EXPO_PUBLIC_API_URL: la API (en el celular, la IP de tu computadora, no localhost)
+npx expo start -c
+```
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+Escanea el QR con **Expo Go** (SDK 58).
 
-## Learn more
+```bash
+npm test          # pruebas
+npm run lint      # ESLint
+npx tsc --noEmit  # tipos
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+## Publicar (EAS Update)
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+eas update --channel production --environment production --message "descripción del cambio"
+```
 
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- `EXPO_PUBLIC_API_URL` de producción vive en el environment `production` de EAS.
+- `runtimeVersion` usa la política `sdkVersion`, la que Expo Go puede abrir.
+- Para abrir la actualización en Expo Go hay que iniciar sesión en Expo Go con la cuenta dueña del proyecto.
