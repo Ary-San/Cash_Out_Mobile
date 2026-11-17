@@ -1,12 +1,26 @@
-# Cash-Out · App móvil
+# Proyecto: Cash-Out - App móvil
 
-App de finanzas personales para jóvenes: registra lo que entra y sale (en soles), ponle metas a tu ahorro y practica invertir con **fichas** sobre precios reales, sin arriesgar dinero. Es el cliente móvil del proyecto Cash-Out (CS2031 · Desarrollo Basado en Plataformas, UTEC).
+**Curso:** CS2031 Desarrollo Basado en Plataformas, 2026-2, UTEC
 
-- **Web:** https://cash-out-front-web.vercel.app
-- **API:** `https://cash-out-front-web.vercel.app/api/v1` (backend Spring Boot en AWS, detrás del proxy HTTPS de Vercel)
-- **Publicación:** EAS Update, canal `production`, se abre en **Expo Go** (SDK 58)
+**Integrantes:**
 
-## Qué hace
+| Nombre | Código | Participación |
+|:------:|:------:|:-------------:|
+| Azul Arbulú Silva | 202510303 | 100\% |
+| Alba Abigail Cabrera Pilco | 202510505 | 100\% |
+| Dylan Carlo Van Oordt Arbulú | 202510757 | 100\% |
+| Ary Fernando Sanchez Cerna | 201920061 | 100\% |
+| Miguel Angel Flores Cardenas | 202510147 | 100\% |
+
+---
+
+App de finanzas personales para jóvenes: registra lo que entra y sale (en soles), ponle metas a tu ahorro y practica invertir con **fichas** sobre precios reales, sin arriesgar dinero.
+
+- **Web:** <https://cash-out-front-web.vercel.app>
+- **API:** <https://cash-out-front-web.vercel.app/api/v1>
+- **Publicación:** EAS Update, canal `production`, se abre en *Expo Go* (SDK 58)
+
+## Explicación breve de sus funciones
 
 | Pantalla | Funciones |
 |---|---|
@@ -21,7 +35,7 @@ App de finanzas personales para jóvenes: registra lo que entra y sale (en soles
 ## Tecnologías
 
 ### Base
-- **Expo SDK 58** · **React Native 0.88** · **React 19.3** · **TypeScript**
+- **Expo SDK 58** - **React Native 0.88** - **React 19.3** - **TypeScript**
 - **expo-router**: rutas por archivos (`app/`), pestañas y pantallas apiladas, rutas protegidas por sesión
 - **React Compiler** activo (memorización automática)
 
