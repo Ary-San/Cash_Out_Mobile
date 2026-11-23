@@ -4,16 +4,19 @@ import { streamEvents } from "@/services/eventStream"
 
 export type RoomConnection = "connecting" | "live" | "reconnecting" | "missing"
 
+const replace = <T,>(_prev: T | null, next: T) => next
+
 /**
  * Una sala en vivo: escucha el SSE de la sala y reconecta si se corta (cada vez
  * esperando un poco mas, hasta 15 s). `apply` mezcla tambien lo que devuelven
- * las acciones (entrar, votar…), para no esperar al siguiente evento.
+ * las acciones (entrar, votar…), para no esperar al siguiente evento. `merge`
+ * junta el estado nuevo con el anterior y tiene que ser estable (definida fuera del componente).
  */
-export function useLiveRoom<T>(path: string) {
+export function useLiveRoom<T>(path: string, merge: (prev: T | null, next: T) => T = replace) {
   const [view, setView] = useState<T | null>(null)
   const [connection, setConnection] = useState<RoomConnection>("connecting")
 
-  const apply = useCallback((next: T) => setView(next), [])
+  const apply = useCallback((next: T) => setView((prev) => merge(prev, next)), [merge])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -26,7 +29,7 @@ export function useLiveRoom<T>(path: string) {
         ({ data }) => {
           attempt = 0
           setConnection("live")
-          setView(JSON.parse(data) as T)
+          apply(JSON.parse(data) as T)
         },
         controller.signal,
       )
@@ -52,7 +55,7 @@ export function useLiveRoom<T>(path: string) {
       controller.abort()
       clearTimeout(timer)
     }
-  }, [path])
+  }, [path, apply])
 
   return { view, connection, apply }
 }

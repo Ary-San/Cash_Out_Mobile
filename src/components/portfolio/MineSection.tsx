@@ -84,7 +84,7 @@ export function MineSection({ portfolio, tokens, version, onTrade, onExplore }: 
           </View>
           <View className="flex-1">
             <Text weight="semibold" className="text-[15px]">Aprende jugando</Text>
-            <Text tone="muted" className="text-[13px] leading-5">¿Sube o baja? y Arma tu portafolio, con tu grupo desde el celular o la laptop</Text>
+            <Text tone="muted" className="text-[13px] leading-5">¿Sube o baja?, Arma tu portafolio y la Carrera, con tu grupo desde el celular o la laptop</Text>
           </View>
           <ChevronRight size={18} color={colors.mutedForeground} />
         </Card>

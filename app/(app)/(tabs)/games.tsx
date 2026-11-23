@@ -1,7 +1,7 @@
 import { useState } from "react"
-import { View } from "react-native"
+import { Pressable, View } from "react-native"
 import { router } from "expo-router"
-import { ChartPie, ScanLine, TrendingUp, type LucideIcon } from "lucide-react-native"
+import { ChartPie, Flag, ScanLine, TrendingUp, type LucideIcon } from "lucide-react-native"
 import { toApiError, userMessage } from "@/api/errors"
 import { Button } from "@/components/ui/Button"
 import { Card } from "@/components/ui/Card"
@@ -11,11 +11,14 @@ import { Text } from "@/components/ui/Text"
 import { useToast } from "@/components/ui/Toast"
 import { useAsyncAction } from "@/hooks/useAsyncAction"
 import { ROOM_CODE_LENGTH, ROOM_GAMES, findRoomGame, normalizeRoomCode, type RoomGame } from "@/lib/rooms"
+import { RACE_FEES } from "@/lib/race"
+import { TOUCH_SLOP } from "@/lib/touch"
 import { portfolioGameService } from "@/services/portfolioGameService"
+import { raceService } from "@/services/raceService"
 import { updownService } from "@/services/updownService"
 import { usePalette } from "@/theme/palette"
 
-const GAMES: { game: RoomGame; icon: LucideIcon; pitch: string; detail: string; create: () => Promise<{ code: string }> }[] = [
+const GAMES: { game: RoomGame; icon: LucideIcon; pitch: string; detail: string; create: (fee: number) => Promise<{ code: string }> }[] = [
   {
     game: "updown",
     icon: TrendingUp,
@@ -30,6 +33,13 @@ const GAMES: { game: RoomGame; icon: LucideIcon; pitch: string; detail: string; 
     detail: "Gana el mejor rendimiento ajustado por riesgo, no el que más arriesga.",
     create: portfolioGameService.create,
   },
+  {
+    game: "race",
+    icon: Flag,
+    pitch: "Todos operan la misma moneda misteriosa en un día real del mercado cripto.",
+    detail: "Seis horas de mercado en 90 segundos. El podio se reparte el pozo 50 / 30 / 20.",
+    create: raceService.create,
+  },
 ]
 
 /**
@@ -43,11 +53,13 @@ export default function GamesScreen() {
   const [code, setCode] = useState("")
   const [error, setError] = useState<string>()
   const [creating, setCreating] = useState<RoomGame | null>(null)
+  // La carrera se crea con una cuota en fichas; gratis es para practicar.
+  const [fee, setFee] = useState<number>(0)
 
   const create = useAsyncAction(async (game: RoomGame) => {
     setCreating(game)
     try {
-      const room = await GAMES.find((item) => item.game === game)!.create()
+      const room = await GAMES.find((item) => item.game === game)!.create(fee)
       router.push({ pathname: ROOM_GAMES[game].screen, params: { code: room.code } })
     } catch (err) {
       toast(userMessage(toApiError(err)))
@@ -108,10 +120,37 @@ export default function GamesScreen() {
             </View>
           </View>
           <Text tone="muted" className="text-[13px] leading-5">{detail}</Text>
+          {game === "race" ? <FeePicker fee={fee} onChange={setFee} /> : null}
           <Button label="Crear sala" variant="outline" loading={creating === game} disabled={creating !== null && creating !== game} onPress={() => void create.run(game)} />
         </Card>
       ))}
       <Text tone="muted" className="px-1 text-xs">Quien crea la sala la maneja desde su celular; los demás entran con el código o el QR.</Text>
     </Screen>
+  )
+}
+
+function FeePicker({ fee, onChange }: { fee: number; onChange: (fee: number) => void }) {
+  return (
+    <View className="gap-1.5">
+      <Text weight="medium" className="text-sm">Cuota de entrada</Text>
+      <View role="radiogroup" aria-label="Cuota de entrada" className="flex-row gap-2">
+        {RACE_FEES.map((option) => {
+          const on = fee === option
+          return (
+            <Pressable
+              key={option}
+              hitSlop={TOUCH_SLOP}
+              role="radio"
+              aria-checked={on}
+              onPress={() => onChange(option)}
+              className={`min-h-9 flex-1 items-center justify-center rounded-full border ${on ? "border-accent-ink bg-accent" : "border-border"}`}
+            >
+              <Text weight={on ? "semibold" : "regular"} className="text-[13px]">{option === 0 ? "Gratis" : `${option}`}</Text>
+            </Pressable>
+          )
+        })}
+      </View>
+      <Text tone="muted" className="text-xs">{fee === 0 ? "Sin cuota no hay pozo: es para practicar." : `${fee} fichas por jugador. Las cuotas forman el pozo del podio.`}</Text>
+    </View>
   )
 }

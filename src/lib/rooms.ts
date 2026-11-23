@@ -4,8 +4,10 @@ import { API_URL } from "@/config"
 
 /** Los juegos en grupo de la app, con su ruta en la web, su API y su pantalla en la app. */
 export const ROOM_GAMES = {
-  updown: { name: "¿Sube o baja?", webPath: "sube-o-baja", api: "/updown-rooms", screen: "/games/updown/[code]" },
-  portfolio: { name: "Arma tu portafolio", webPath: "arma-tu-portafolio", api: "/portfolio-rooms", screen: "/games/portfolio/[code]" },
+  updown: { name: "¿Sube o baja?", webPath: "minijuegos/sube-o-baja", api: "/updown-rooms", screen: "/games/updown/[code]" },
+  portfolio: { name: "Arma tu portafolio", webPath: "minijuegos/arma-tu-portafolio", api: "/portfolio-rooms", screen: "/games/portfolio/[code]" },
+  // En la web la carrera vive en /carrera, fuera de /minijuegos.
+  race: { name: "Carrera de trading", webPath: "carrera", api: "/race-rooms", screen: "/games/race/[code]" },
 } as const
 
 export type RoomGame = keyof typeof ROOM_GAMES
@@ -26,7 +28,7 @@ const WEB_ORIGIN = API_URL.replace(/\/api\/v1$/, "")
  * entran por ahi, y la app reconoce el mismo link al escanearlo.
  */
 export function roomJoinUrl(game: RoomGame, code: string): string {
-  return `${WEB_ORIGIN}/minijuegos/${ROOM_GAMES[game].webPath}/${code}`
+  return `${WEB_ORIGIN}/${ROOM_GAMES[game].webPath}/${code}`
 }
 
 /**
@@ -36,7 +38,7 @@ export function roomJoinUrl(game: RoomGame, code: string): string {
 export function parseRoomQr(data: string): { game: RoomGame | null; code: string } | null {
   const text = data.trim()
   for (const [game, meta] of Object.entries(ROOM_GAMES) as [RoomGame, (typeof ROOM_GAMES)[RoomGame]][]) {
-    const match = text.match(new RegExp(`/minijuegos/${meta.webPath}/([A-Za-z0-9]{6})(?![A-Za-z0-9])`))
+    const match = text.match(new RegExp(`/${meta.webPath}/([A-Za-z0-9]{6})(?![A-Za-z0-9])`))
     if (match) return { game, code: match[1].toUpperCase() }
   }
   return /^[A-Za-z0-9]{6}$/.test(text) ? { game: null, code: text.toUpperCase() } : null
