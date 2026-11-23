@@ -30,6 +30,7 @@ App de finanzas personales para jóvenes: registra lo que entra y sale (en soles
 | Metas | Crear, aportar, pronóstico de llegada, celebración al cumplir (+ fichas) |
 | Proyecciones | Interés simple vs compuesto, tasas de referencia, escenarios guardados y "proyectar esta meta" |
 | Portafolio | Mercado (acciones de EE. UU. y cripto), órdenes con fichas, posiciones, noticias, favoritos |
+| Minijuegos | Salas en vivo de **¿Sube o baja?**, **Arma tu portafolio** y la **Carrera de trading**: crear la sala desde el celular (anfitrión) o entrar con el código o el QR; celular y laptop juegan en la misma sala |
 | Perfil | Datos y foto, contraseña, biometría, tema, correos del banco (Gmail), atajo de iPhone, eliminar cuenta |
 
 ## Tecnologías
@@ -56,9 +57,16 @@ App de finanzas personales para jóvenes: registra lo que entra y sale (en soles
 - **zod** + **react-hook-form**: validación antes de enviar, con las mismas reglas que el backend
 - **@react-native-community/netinfo**: aviso sin conexión y recarga automática al volver la red
 
+### Minijuegos en vivo
+- **Salas por SSE** (`useLiveRoom`): el estado de la sala llega en vivo y se reconecta solo si se corta la red; la carrera suma a la serie el precio de cada tick (4 por segundo)
+- **Las mismas salas que la web**: el QR lleva el link de la web, así que una laptop o un celular sin la app entran por el navegador, y la app reconoce el mismo link al escanearlo. Con solo el código, la app averigua de qué juego es la sala
+- **react-native-qrcode-svg**: el QR de la sala para el anfitrión, con el botón de compartir el código
+- **expo-keep-awake**: la pantalla no se apaga durante la partida
+- La cuota de la carrera son fichas reales: se confirma el monto y, con la biometría activa, con la huella; si son menos de 3 jugadores se devuelve
+
 ### Sensores
-- **Cámara** (`expo-camera`): leer el QR de las boletas SUNAT; **expo-image-picker** para la foto de perfil
-- **Lector de huella o rostro** (`expo-local-authentication`): entrar a la app y confirmar órdenes y la eliminación de la cuenta
+- **Cámara** (`expo-camera`): leer el QR de las boletas SUNAT y el de las salas de minijuegos; **expo-image-picker** para la foto de perfil
+- **Lector de huella o rostro** (`expo-local-authentication`): entrar a la app y confirmar órdenes, la cuota de la carrera y la eliminación de la cuenta
 
 ### Seguridad
 - Token de acceso solo en memoria; refresh token en **expo-secure-store** (Keystore / Keychain)
@@ -72,22 +80,23 @@ App de finanzas personales para jóvenes: registra lo que entra y sale (en soles
 - Respeta "Reducir movimiento"; ancho máximo en tablet
 
 ### Calidad
-- **Jest 30** + **React Native Testing Library 14** (90 pruebas), **ESLint** (`expo lint`) y `tsc`
+- **Jest 30** + **React Native Testing Library 14** (104 pruebas), **ESLint** (`expo lint`) y `tsc`
 
 ## Estructura
 
 ```
 app/                 rutas (expo-router)
   (auth)/            bienvenida, login, registro
-  (app)/(tabs)/      resumen, movimientos, metas, portafolio, perfil
-  (app)/...          detalle de meta, activo, movimiento, proyección, ajustes, escáner
+  (app)/(tabs)/      resumen, movimientos, metas, portafolio, perfil y minijuegos
+  (app)/games/       las salas en vivo (sube o baja, portafolio, carrera) y el escáner de salas
+  (app)/...          detalle de meta, activo, movimiento, proyección, ajustes, escáner de boletas
 src/
   api/               cliente axios, errores, almacenamiento de tokens
   services/          una capa por recurso del backend
-  hooks/             lógica reutilizable (consultas, polling, biometría, movimiento reducido)
+  hooks/             lógica reutilizable (consultas, polling, salas en vivo, biometría, movimiento reducido)
   contexts/          sesión
   components/        UI por dominio y componentes base en ui/
-  lib/               reglas puras (montos, fechas, proyecciones, validación)
+  lib/               reglas puras (montos, fechas, proyecciones, salas y reglas de cada juego, validación)
   theme/             paleta y preferencia de tema
   types/             tipos de las respuestas del backend
 __tests__/           pruebas de pantallas y flujos
