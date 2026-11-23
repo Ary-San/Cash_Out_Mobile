@@ -1,6 +1,7 @@
 import { useCallback, useRef } from "react"
 import { Pressable, View } from "react-native"
 import { router, useFocusEffect } from "expo-router"
+import { ChevronRight, Gamepad2 } from "lucide-react-native"
 import { MovementRow } from "@/components/movements/MovementRow"
 import { BalanceCard } from "@/components/summary/BalanceCard"
 import { CategoryBars } from "@/components/summary/CategoryBars"
@@ -21,6 +22,7 @@ import { movementKey } from "@/lib/movements"
 import { financeService } from "@/services/financeService"
 import { goalService } from "@/services/goalService"
 import { movementService } from "@/services/movementService"
+import { usePalette } from "@/theme/palette"
 
 const MONTH_NAME = new Intl.DateTimeFormat("es-PE", { month: "long" })
 
@@ -36,6 +38,7 @@ function CardSkeleton({ height }: { height: number }) {
 
 export default function SummaryScreen() {
   const { user } = useAuth()
+  const colors = usePalette()
   const month = monthOf(todayIso())
   const previousMonth = previousMonthOf(month)
   const monthName = MONTH_NAME.format(new Date(`${month}-15T12:00:00`)).toLowerCase()
@@ -93,6 +96,20 @@ export default function SummaryScreen() {
           { label: "Aportar", icon: ACTION_ICONS.contribute, onPress: () => router.navigate("/goals") },
         ]}
       />
+
+      {/* Un acceso a la vista: a quien le pasan un codigo de sala tiene que encontrar donde ponerlo. */}
+      <Pressable role="link" aria-label="Minijuegos: crea una sala o únete con un código" onPress={() => router.push("/games")} className="active:opacity-80">
+        <Card className="min-h-14 flex-row items-center gap-3 py-3">
+          <View className="size-9 items-center justify-center rounded-xl bg-accent">
+            <Gamepad2 size={18} color={colors.accentInk} />
+          </View>
+          <View className="flex-1">
+            <Text weight="semibold" className="text-sm">Minijuegos en grupo</Text>
+            <Text tone="muted" className="text-xs">Crea una sala o únete con un código</Text>
+          </View>
+          <ChevronRight size={18} color={colors.mutedForeground} />
+        </Card>
+      </Pressable>
 
       {isNew ? <FirstSteps /> : null}
 

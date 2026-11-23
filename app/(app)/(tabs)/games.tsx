@@ -1,15 +1,117 @@
-import { Gamepad2 } from "lucide-react-native"
+import { useState } from "react"
+import { View } from "react-native"
+import { router } from "expo-router"
+import { ChartPie, ScanLine, TrendingUp, type LucideIcon } from "lucide-react-native"
+import { toApiError, userMessage } from "@/api/errors"
+import { Button } from "@/components/ui/Button"
+import { Card } from "@/components/ui/Card"
+import { Field } from "@/components/ui/Field"
 import { Screen } from "@/components/ui/Screen"
-import { EmptyState } from "@/components/ui/States"
+import { Text } from "@/components/ui/Text"
+import { useToast } from "@/components/ui/Toast"
+import { useAsyncAction } from "@/hooks/useAsyncAction"
+import { ROOM_CODE_LENGTH, ROOM_GAMES, findRoomGame, normalizeRoomCode, type RoomGame } from "@/lib/rooms"
+import { portfolioGameService } from "@/services/portfolioGameService"
+import { updownService } from "@/services/updownService"
+import { usePalette } from "@/theme/palette"
 
+const GAMES: { game: RoomGame; icon: LucideIcon; pitch: string; detail: string; create: () => Promise<{ code: string }> }[] = [
+  {
+    game: "updown",
+    icon: TrendingUp,
+    pitch: "Noticias reales: apuesta qué hizo el mercado el mes siguiente.",
+    detail: "8 rondas de 20 segundos. Empiezas con 1000 puntos y apuestas lo que quieras.",
+    create: updownService.create,
+  },
+  {
+    game: "portfolio",
+    icon: ChartPie,
+    pitch: "Reparte tu dinero entre 8 sectores y míralo pasar por 5 semestres reales.",
+    detail: "Gana el mejor rendimiento ajustado por riesgo, no el que más arriesga.",
+    create: portfolioGameService.create,
+  },
+]
+
+/**
+ * Minijuegos en grupo: crear una sala (este celular es el anfitrion) o entrar a
+ * una con el codigo o el QR. Las salas son las mismas de la web: celulares y
+ * laptops juegan juntos.
+ */
 export default function GamesScreen() {
+  const colors = usePalette()
+  const toast = useToast()
+  const [code, setCode] = useState("")
+  const [error, setError] = useState<string>()
+  const [creating, setCreating] = useState<RoomGame | null>(null)
+
+  const create = useAsyncAction(async (game: RoomGame) => {
+    setCreating(game)
+    try {
+      const room = await GAMES.find((item) => item.game === game)!.create()
+      router.push({ pathname: ROOM_GAMES[game].screen, params: { code: room.code } })
+    } catch (err) {
+      toast(userMessage(toApiError(err)))
+    } finally {
+      setCreating(null)
+    }
+  })
+
+  // Con el codigo solo no se sabe el juego: se busca la sala antes de entrar.
+  const join = useAsyncAction(async () => {
+    if (code.length !== ROOM_CODE_LENGTH) return setError(`El código tiene ${ROOM_CODE_LENGTH} letras y números.`)
+    try {
+      const game = await findRoomGame(code)
+      if (!game) return setError("No encontramos una sala con ese código. Revísalo o pídele el QR a quien la creó.")
+      router.push({ pathname: ROOM_GAMES[game].screen, params: { code } })
+    } catch (err) {
+      setError(userMessage(toApiError(err)))
+    }
+  })
+
   return (
-    <Screen title="Minijuegos" subtitle="Aprende jugando con tu grupo">
-      <EmptyState
-        icon={Gamepad2}
-        title="Únete a una sala"
-        message="Vas a poder entrar con el código o escaneando el QR que muestra el anfitrión."
-      />
+    <Screen back title="Minijuegos" subtitle="Aprende jugando con tu grupo, desde el celular o la laptop">
+      <Card className="gap-3">
+        <Text weight="semibold" className="text-base">Entrar a una sala</Text>
+        <Field
+          label="Código de la sala"
+          value={code}
+          onChangeText={(value) => {
+            setCode(normalizeRoomCode(value))
+            setError(undefined)
+          }}
+          placeholder="Por ejemplo: K7M2QX"
+          autoCapitalize="characters"
+          autoCorrect={false}
+          maxLength={ROOM_CODE_LENGTH + 2}
+          returnKeyType="go"
+          onSubmitEditing={() => void join.run()}
+          error={error}
+        />
+        <Button label="Entrar" disabled={code.length === 0} loading={join.isPending} onPress={() => void join.run()} />
+        <Button label="Escanear el QR de la sala" variant="outline" onPress={() => router.push("/games/scan")} />
+        <View className="flex-row items-center gap-1.5">
+          <ScanLine size={14} color={colors.mutedForeground} />
+          <Text tone="muted" className="flex-1 text-xs">El QR lo muestra quien creó la sala, en su celular o en la pantalla de la laptop.</Text>
+        </View>
+      </Card>
+
+      <Text weight="medium" tone="muted" className="px-1 text-[11px] uppercase tracking-widest">Crear una sala</Text>
+      {GAMES.map(({ game, icon: Icon, pitch, detail }) => (
+        <Card key={game} className="gap-3">
+          <View className="flex-row items-center gap-3">
+            <View className="size-11 items-center justify-center rounded-xl bg-accent">
+              <Icon size={22} color={colors.accentInk} />
+            </View>
+            <View className="flex-1">
+              <Text weight="semibold" className="text-base">{ROOM_GAMES[game].name}</Text>
+              <Text tone="muted" className="text-[13px] leading-5">{pitch}</Text>
+            </View>
+          </View>
+          <Text tone="muted" className="text-[13px] leading-5">{detail}</Text>
+          <Button label="Crear sala" variant="outline" loading={creating === game} disabled={creating !== null && creating !== game} onPress={() => void create.run(game)} />
+        </Card>
+      ))}
+      <Text tone="muted" className="px-1 text-xs">Quien crea la sala la maneja desde su celular; los demás entran con el código o el QR.</Text>
     </Screen>
   )
 }
