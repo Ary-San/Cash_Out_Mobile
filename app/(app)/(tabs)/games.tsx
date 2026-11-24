@@ -82,7 +82,7 @@ export default function GamesScreen() {
   })
 
   return (
-    <Screen back title="Minijuegos" subtitle="Aprende jugando con tu grupo, desde el celular o la laptop">
+    <Screen title="Minijuegos" subtitle="Aprende jugando con tu grupo, desde el celular o la laptop">
       <Card className="gap-3">
         <Text weight="semibold" className="text-base">Entrar a una sala</Text>
         <Field
