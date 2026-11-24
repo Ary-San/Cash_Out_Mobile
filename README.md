@@ -30,7 +30,7 @@ App de finanzas personales para jóvenes: registra lo que entra y sale (en soles
 | Metas | Crear, aportar, pronóstico de llegada, celebración al cumplir (+ fichas) |
 | Proyecciones | Interés simple vs compuesto, tasas de referencia, escenarios guardados y "proyectar esta meta" |
 | Portafolio | Mercado (acciones de EE. UU. y cripto), órdenes con fichas, posiciones, noticias, favoritos |
-| Minijuegos | Salas en vivo de **¿Sube o baja?**, **Arma tu portafolio** y la **Carrera de trading**: crear la sala desde el celular (anfitrión) o entrar con el código o el QR; celular y laptop juegan en la misma sala |
+| Minijuegos | Salas en vivo de **¿Sube o baja?**, **Arma tu portafolio** y la **Carrera de trading**: crear la sala desde el celular (anfitrión) o entrar con el código o el QR; celular y laptop juegan en la misma sala. Además, 3 juegos de práctica de a uno (**Interés compuesto**, **Apuesta o inversión** y **Préstamos**) que pagan fichas según tu puntaje |
 | Perfil | Datos y foto, contraseña, biometría, tema, correos del banco (Gmail), atajo de iPhone, eliminar cuenta |
 
 ## Tecnologías
@@ -64,6 +64,11 @@ App de finanzas personales para jóvenes: registra lo que entra y sale (en soles
 - **expo-keep-awake**: la pantalla no se apaga durante la partida
 - La cuota de la carrera son fichas reales: se confirma el monto y, con la biometría activa, con la huella; si son menos de 3 jugadores se devuelve
 
+### Juegos de práctica
+- El catálogo (costo y premio máximo) viene del backend; las preguntas y rondas viven en la app (`src/games/`), las mismas de la web
+- Cada partida mezcla el orden y las opciones; el puntaje (0 a 100) se registra al terminar y el backend cobra el costo y paga el premio en una sola operación
+- Salir a mitad no cobra nada; un juego pagado no empieza si no se sabe si alcanzan las fichas
+
 ### Sensores
 - **Cámara** (`expo-camera`): leer el QR de las boletas SUNAT y el de las salas de minijuegos; **expo-image-picker** para la foto de perfil
 - **Lector de huella o rostro** (`expo-local-authentication`): entrar a la app y confirmar órdenes, la cuota de la carrera y la eliminación de la cuenta
@@ -80,7 +85,7 @@ App de finanzas personales para jóvenes: registra lo que entra y sale (en soles
 - Respeta "Reducir movimiento"; ancho máximo en tablet
 
 ### Calidad
-- **Jest 30** + **React Native Testing Library 14** (104 pruebas), **ESLint** (`expo lint`) y `tsc`
+- **Jest 30** + **React Native Testing Library 14** (109 pruebas), **ESLint** (`expo lint`) y `tsc`
 
 ## Estructura
 
@@ -88,7 +93,7 @@ App de finanzas personales para jóvenes: registra lo que entra y sale (en soles
 app/                 rutas (expo-router)
   (auth)/            bienvenida, login, registro
   (app)/(tabs)/      resumen, movimientos, metas, portafolio, perfil y minijuegos
-  (app)/games/       las salas en vivo (sube o baja, portafolio, carrera) y el escáner de salas
+  (app)/games/       las salas en vivo (sube o baja, portafolio, carrera), los juegos de práctica y el escáner de salas
   (app)/...          detalle de meta, activo, movimiento, proyección, ajustes, escáner de boletas
 src/
   api/               cliente axios, errores, almacenamiento de tokens
@@ -96,7 +101,8 @@ src/
   hooks/             lógica reutilizable (consultas, polling, salas en vivo, biometría, movimiento reducido)
   contexts/          sesión
   components/        UI por dominio y componentes base en ui/
-  lib/               reglas puras (montos, fechas, proyecciones, salas y reglas de cada juego, validación)
+  games/             preguntas y rondas de los juegos de práctica
+  lib/               reglas puras (montos, fechas, proyecciones, préstamos, salas y reglas de cada juego, validación)
   theme/             paleta y preferencia de tema
   types/             tipos de las respuestas del backend
 __tests__/           pruebas de pantallas y flujos

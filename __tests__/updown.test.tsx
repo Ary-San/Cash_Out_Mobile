@@ -13,6 +13,7 @@ jest.mock("@/services/eventStream", () => ({ streamEvents: jest.fn() }))
 jest.mock("@/services/updownService", () => ({
   updownService: { create: jest.fn(), join: jest.fn(), start: jest.fn(), vote: jest.fn(), reveal: jest.fn(), next: jest.fn(), cancel: jest.fn() },
 }))
+jest.mock("@/services/minigameService", () => ({ minigameService: { list: jest.fn(async () => []), sessions: jest.fn(async () => []) } }))
 jest.mock("expo-keep-awake", () => ({ useKeepAwake: jest.fn() }))
 jest.mock("react-native-qrcode-svg", () => () => null)
 jest.mock("expo-router", () => ({ router: { push: jest.fn(), back: jest.fn(), replace: jest.fn() }, useLocalSearchParams: () => ({ code: "k7m2qx" }), useNavigation: () => ({ dispatch: jest.fn() }), usePreventRemove: jest.fn() }))

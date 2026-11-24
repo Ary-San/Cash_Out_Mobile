@@ -16,6 +16,7 @@ import { TOUCH_SLOP } from "@/lib/touch"
 import { portfolioGameService } from "@/services/portfolioGameService"
 import { raceService } from "@/services/raceService"
 import { updownService } from "@/services/updownService"
+import { PracticeGames } from "@/components/minigames/PracticeGames"
 import { usePalette } from "@/theme/palette"
 
 const GAMES: { game: RoomGame; icon: LucideIcon; pitch: string; detail: string; create: (fee: number) => Promise<{ code: string }> }[] = [
@@ -125,6 +126,9 @@ export default function GamesScreen() {
         </Card>
       ))}
       <Text tone="muted" className="px-1 text-xs">Quien crea la sala la maneja desde su celular; los demás entran con el código o el QR.</Text>
+
+      <Text weight="medium" tone="muted" className="px-1 text-[11px] uppercase tracking-widest">Para practicar solo</Text>
+      <PracticeGames />
     </Screen>
   )
 }

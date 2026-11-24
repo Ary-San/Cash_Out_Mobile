@@ -1,4 +1,4 @@
-import type { ReactNode } from "react"
+import type { ComponentRef, ReactNode, Ref } from "react"
 import { FlatList, KeyboardAvoidingView, Platform, Pressable, RefreshControl, ScrollView, View, type ListRenderItem } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 import { router } from "expo-router"
@@ -17,16 +17,19 @@ interface ScreenProps {
   refreshing?: boolean
   /** Las pantallas que se abren encima de las pestanas tienen "Volver". */
   back?: boolean
+  /** El scroll de la pantalla, para volver arriba o bajar a lo que aparece al final. */
+  scrollRef?: Ref<ComponentRef<typeof ScrollView>>
 }
 
 /** El marco de cada pantalla: area segura arriba, titulo y contenido con scroll que el teclado no tapa. */
-export function Screen({ children, onRefresh, refreshing = false, back = false, ...header }: ScreenProps) {
+export function Screen({ children, onRefresh, refreshing = false, back = false, scrollRef, ...header }: ScreenProps) {
   const colors = usePalette()
 
   return (
     <SafeAreaView edges={back ? ["top", "bottom"] : ["top"]} className="flex-1 bg-background">
       <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <ScrollView
+          ref={scrollRef}
           // En tablet el contenido no se estira: queda centrado con un ancho de lectura.
           contentContainerClassName="w-full max-w-[640px] gap-5 self-center px-5 pb-8 pt-4"
           keyboardShouldPersistTaps="handled"

@@ -15,6 +15,7 @@ jest.mock("@/services/portfolioGameService", () => ({
   portfolioGameService: { create: jest.fn(), join: jest.fn(), start: jest.fn(), next: jest.fn(), allocate: jest.fn(), unready: jest.fn(), cancel: jest.fn() },
 }))
 jest.mock("@/api/client", () => ({ http: { get: jest.fn() } }))
+jest.mock("@/services/minigameService", () => ({ minigameService: { list: jest.fn(async () => []), sessions: jest.fn(async () => []) } }))
 jest.mock("expo-keep-awake", () => ({ useKeepAwake: jest.fn() }))
 jest.mock("react-native-qrcode-svg", () => () => null)
 jest.mock("expo-router", () => ({
