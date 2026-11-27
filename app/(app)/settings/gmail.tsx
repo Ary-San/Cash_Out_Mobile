@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react"
+import { useTwoFactorPrompt } from "@/components/auth/TwoFactorPrompt"
 import { AppState, View } from "react-native"
-import { useFocusEffect } from "expo-router"
+import * as Linking from "expo-linking"
+import { useFocusEffect, useLocalSearchParams } from "expo-router"
 import * as WebBrowser from "expo-web-browser"
 import { Check, Mail, RefreshCw } from "lucide-react-native"
 import { userMessage, toApiError } from "@/api/errors"
@@ -25,6 +27,7 @@ const PRIVACY = [
 ]
 
 export default function GmailScreen() {
+  const { ask: askCode, sheet: codeSheet } = useTwoFactorPrompt()
   const colors = usePalette()
   const toast = useToast()
   const status = useApiQuery(["gmail-status"], (signal) => autoRegisterService.gmailStatus(signal))
@@ -55,7 +58,46 @@ export default function GmailScreen() {
     [reload, toast],
   )
 
-  // Google vuelve a la web, no a la app: cuando el estado pasa a conectado, se pregunta por el mes.
+  /**
+   * Lo que trae la vuelta de Google. El permiso todavia no esta guardado: el
+   * backend lo deja con un ticket que solo esta sesion puede confirmar (asi un
+   * enlace reenviado no sirve para quedarse con el Gmail de otra persona).
+   */
+  const handled = useRef<string | null>(null)
+  const finish = useCallback(
+    async (gmail?: string, ticket?: string) => {
+      if (gmail === "confirmar" && ticket) {
+        // El mismo enlace puede llegar dos veces (la sesion del navegador y la ruta): el ticket sirve una.
+        if (handled.current === ticket) return
+        handled.current = ticket
+        try {
+          await autoRegisterService.confirmGmail(ticket)
+          waiting.current = true
+          reload()
+        } catch (err) {
+          waiting.current = false
+          toast(userMessage(toApiError(err)))
+        }
+      } else if (gmail === "cancelado") {
+        waiting.current = false
+        toast("Cancelaste el permiso en Google: Gmail sigue sin conectar.")
+      } else if (gmail === "error") {
+        waiting.current = false
+        toast("No pudimos conectar Gmail. Inténtalo de nuevo.")
+      } else {
+        reload()
+      }
+    },
+    [reload, toast],
+  )
+
+  // En Android el enlace de vuelta tambien puede abrir esta pantalla directamente.
+  const params = useLocalSearchParams<{ gmail?: string; ticket?: string }>()
+  useEffect(() => {
+    if (params.gmail) void finish(params.gmail, params.ticket)
+  }, [params.gmail, params.ticket, finish])
+
+  // Cuando el estado pasa a conectado, se pregunta por el mes.
   const connected = status.data?.connected ?? false
   useEffect(() => {
     if (!waiting.current || !connected) return
@@ -69,12 +111,22 @@ export default function GmailScreen() {
   }, [connected, scan, toast])
 
   const connect = async () => {
+    // Con 2FA, conectar el correo tambien pide el codigo.
+    const code = await askCode("conectar Gmail")
+    if (code === null) return
     setBusy(true)
     try {
-      const url = await autoRegisterService.gmailConnectUrl()
-      waiting.current = true
-      await WebBrowser.openBrowserAsync(url)
-      reload()
+      // Google vuelve a esta pantalla de la app (no a la web, donde no hay sesion para confirmar).
+      const returnTo = Linking.createURL("settings/gmail")
+      const url = await autoRegisterService.gmailConnectUrl(returnTo, code)
+      const result = await WebBrowser.openAuthSessionAsync(url, returnTo)
+      if (result.type === "success") {
+        const { queryParams } = Linking.parse(result.url)
+        const value = (key: string) => (typeof queryParams?.[key] === "string" ? (queryParams[key] as string) : undefined)
+        await finish(value("gmail"), value("ticket"))
+      } else {
+        reload()
+      }
     } catch (err) {
       waiting.current = false
       toast(userMessage(toApiError(err)))
@@ -167,6 +219,7 @@ export default function GmailScreen() {
           <Text tone="muted" className="text-xs">Un momento…</Text>
         </View>
       ) : null}
+      {codeSheet}
     </Screen>
   )
 }

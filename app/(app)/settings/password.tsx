@@ -20,6 +20,10 @@ export default function PasswordScreen() {
   const [errors, setErrors] = useState<Partial<Record<Key, string>>>({})
   const [saving, setSaving] = useState(false)
   const [failure, setFailure] = useState<string>()
+  // Con verificacion en dos pasos, cambiar la contrasena tambien pide el codigo.
+  const twoFactor = !!user?.twoFactorEnabled
+  const [code, setCode] = useState("")
+  const [codeError, setCodeError] = useState<string>()
 
   const set = (key: Key) => (value: string) => {
     setValues((prev) => ({ ...prev, [key]: value }))
@@ -35,12 +39,22 @@ export default function PasswordScreen() {
       setErrors(next)
       return
     }
+    if (twoFactor && !code.trim()) {
+      setCodeError("Escribe el código de tu app autenticadora.")
+      return
+    }
     setSaving(true)
     setFailure(undefined)
+    setCodeError(undefined)
     try {
-      await userService.changePassword({ currentPassword: values.currentPassword, newPassword: values.newPassword })
+      await userService.changePassword({ currentPassword: values.currentPassword, newPassword: values.newPassword, twoFactorCode: twoFactor ? code.trim() : undefined })
     } catch (err) {
       const error = toApiError(err)
+      if (twoFactor && error.status === 401 && error.serverMessage?.includes("código")) {
+        setCodeError(error.serverMessage)
+        setSaving(false)
+        return
+      }
       // El backend responde 401 a una contraseña actual equivocada; el cliente ya descarto que sea la sesion.
       if (error.status === 401) setErrors({ currentPassword: "La contraseña actual no es correcta." })
       else if (error.fieldErrors.newPassword) setErrors({ newPassword: "La contraseña no cumple todos los requisitos." })
@@ -50,7 +64,8 @@ export default function PasswordScreen() {
     }
     // El cambio cierra todas las sesiones, tambien esta: se entra de nuevo con la contraseña nueva.
     try {
-      await login({ email: user.email, password: values.newPassword })
+      // Con verificacion en dos pasos, volver a entrar pide otro codigo: mejor desde el inicio.
+      if (twoFactor || !(await login({ email: user.email, password: values.newPassword }))) throw new Error("second step")
       toast("Contraseña actualizada: cerramos tu sesión en los demás dispositivos.")
       router.back()
     } catch {
@@ -89,6 +104,18 @@ export default function PasswordScreen() {
         textContentType="newPassword"
         error={errors.confirmPassword}
       />
+      {twoFactor ? (
+        <Field
+          label="Código de verificación"
+          value={code}
+          onChangeText={setCode}
+          autoComplete="one-time-code"
+          textContentType="oneTimeCode"
+          autoCapitalize="characters"
+          maxLength={13}
+          error={codeError}
+        />
+      ) : null}
       {failure ? <Notice tone="error">{failure}</Notice> : null}
       <Button label="Cambiar contraseña" loading={saving} onPress={() => void save()} />
     </Screen>

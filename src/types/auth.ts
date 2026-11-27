@@ -15,6 +15,8 @@ export interface User {
   avatarUpdatedAt?: string
   /** Entra solo con Google: no tiene contraseña que cambiar. */
   googleOnly?: boolean
+  /** Pide el codigo de la app autenticadora al entrar. */
+  twoFactorEnabled?: boolean
 }
 
 /** Respuesta de login, registro y refresh. */
@@ -25,6 +27,19 @@ export interface AuthResponse {
   /** Segundos. */
   expiresIn: number
   user: User
+}
+
+/**
+ * La contrasena estaba bien, pero la cuenta tiene verificacion en dos pasos:
+ * todavia no hay sesion, solo el desafio para mandar con el codigo.
+ */
+export interface TwoFactorChallenge {
+  twoFactorRequired: true
+  twoFactorChallenge: string
+}
+
+export function isTwoFactorChallenge(value: unknown): value is TwoFactorChallenge {
+  return typeof value === "object" && value !== null && (value as TwoFactorChallenge).twoFactorRequired === true
 }
 
 export interface LoginRequest {
@@ -60,4 +75,6 @@ export interface UpdateUserRequest {
 export interface ChangePasswordRequest {
   currentPassword: string
   newPassword: string
+  /** El codigo de la app autenticadora, si la cuenta tiene verificacion en dos pasos. */
+  twoFactorCode?: string
 }

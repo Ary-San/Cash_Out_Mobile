@@ -9,8 +9,9 @@ export const autoRegisterService = {
   },
 
   /** Crea el token o lo cambia: el anterior deja de funcionar. */
-  async newToken(): Promise<NewIngestToken> {
-    const { data } = await http.post<NewIngestToken>("/ingest-token")
+  /** Con verificacion en dos pasos, el backend pide tambien su codigo. */
+  async newToken(twoFactorCode?: string): Promise<NewIngestToken> {
+    const { data } = await http.post<NewIngestToken>("/ingest-token", twoFactorCode ? { twoFactorCode } : undefined)
     return data
   },
 
@@ -23,10 +24,25 @@ export const autoRegisterService = {
     return data
   },
 
-  /** La direccion de Google para dar el permiso de solo lectura. */
-  async gmailConnectUrl(): Promise<string> {
-    const { data } = await http.post<{ url: string }>("/gmail/connect")
+  /**
+   * La direccion de Google para dar el permiso de solo lectura.
+   *
+   * @param returnTo a donde vuelve Google al terminar: un enlace que abre esta app.
+   *                 El backend solo acepta los de la app (su esquema o su proyecto de Expo).
+   */
+  async gmailConnectUrl(returnTo: string, twoFactorCode?: string): Promise<string> {
+    const { data } = await http.post<{ url: string }>("/gmail/connect", { returnTo, ...(twoFactorCode ? { twoFactorCode } : {}) })
     return data.url
+  },
+
+  /**
+   * Cierra la conexion con el ticket que trajo la vuelta de Google. La vuelta llega
+   * sin sesion, asi que solo quien esta dentro de la cuenta que lo pidio puede
+   * confirmarlo: sin este paso, ese enlace serviria para quedarse con el Gmail de otro.
+   */
+  async confirmGmail(ticket: string): Promise<GmailStatus> {
+    const { data } = await http.post<GmailStatus>("/gmail/confirm", { ticket })
+    return data
   },
 
   /** Lee los correos del banco del mes; again=true devuelve tambien lo descartado del mes. */

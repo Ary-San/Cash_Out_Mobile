@@ -20,8 +20,12 @@ export const userService = {
     await http.put("/users/me/password", request)
   },
 
-  async deleteMe(): Promise<void> {
-    await http.delete("/users/me")
+  /**
+   * Elimina la cuenta. El backend pide la contrasena: el token de acceso dice que
+   * alguien entro con esta cuenta, no que sea su dueno ahora, y aqui no hay vuelta atras.
+   */
+  async deleteMe(confirmation: { password: string; twoFactorCode?: string }): Promise<void> {
+    await http.delete("/users/me", { data: confirmation })
   },
 
   async uploadAvatar(photo: PickedPhoto): Promise<User> {

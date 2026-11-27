@@ -90,7 +90,7 @@ describe("Contraseña", () => {
 })
 
 describe("Eliminar cuenta", () => {
-  it("solo elimina despues de escribir ELIMINAR, y luego cierra la sesion", async () => {
+  it("solo elimina despues de escribir ELIMINAR y la contrasena, y luego cierra la sesion", async () => {
     users.deleteMe.mockResolvedValue()
     await renderIn(<DeleteAccountSheet visible onClose={jest.fn()} />)
 
@@ -98,10 +98,28 @@ describe("Eliminar cuenta", () => {
     expect(users.deleteMe).not.toHaveBeenCalled()
 
     await fireEvent.changeText(screen.getByLabelText("Escribe ELIMINAR para confirmar"), "eliminar")
-    expect(screen.getByText("Listo: el botón Eliminar ya está activo.")).toBeTruthy()
+    expect(screen.getByText("Listo: ahora confirma con tu contraseña.")).toBeTruthy()
+    // La palabra sola no alcanza: el backend pide la contrasena.
+    await fireEvent.press(screen.getByText("Eliminar"))
+    expect(users.deleteMe).not.toHaveBeenCalled()
+
+    await fireEvent.changeText(screen.getByLabelText("Tu contraseña"), "Secreto123!")
     await fireEvent.press(screen.getByText("Eliminar"))
     await screen.findByText("Eliminar")
-    expect(users.deleteMe).toHaveBeenCalled()
+    expect(users.deleteMe).toHaveBeenCalledWith({ password: "Secreto123!" })
     expect(mockAuth.logout).toHaveBeenCalled()
+  })
+
+  it("una cuenta de Google, sin contrasena, se manda a eliminar desde la web", async () => {
+    const before = mockAuth.user
+    mockAuth.user = { ...mockUser, googleOnly: true }
+    await renderIn(<DeleteAccountSheet visible onClose={jest.fn()} />)
+
+    await fireEvent.changeText(screen.getByLabelText("Escribe ELIMINAR para confirmar"), "ELIMINAR")
+    expect(screen.getByText(/Elimínala desde la web/)).toBeTruthy()
+    expect(screen.queryByLabelText("Tu contraseña")).toBeNull()
+    await fireEvent.press(screen.getByText("Eliminar"))
+    expect(users.deleteMe).not.toHaveBeenCalled()
+    mockAuth.user = before
   })
 })

@@ -2,7 +2,7 @@ import { api, http } from "@/api/client"
 import { ApiError } from "@/api/errors"
 import { tokenStore } from "@/api/tokenStore"
 import { USE_MOCKS } from "@/config"
-import type { AuthResponse, LoginRequest, PendingVerification, RegisterRequest } from "@/types/auth"
+import { isTwoFactorChallenge, type AuthResponse, type LoginRequest, type PendingVerification, type RegisterRequest, type TwoFactorChallenge } from "@/types/auth"
 
 const MOCK_AUTH: AuthResponse = {
   accessToken: "mock-access",
@@ -21,7 +21,8 @@ const MOCK_AUTH: AuthResponse = {
 }
 
 export const authService = {
-  async login(request: LoginRequest, signal?: AbortSignal): Promise<AuthResponse> {
+  /** Con verificacion en dos pasos devuelve el desafio y todavia no abre la sesion. */
+  async login(request: LoginRequest, signal?: AbortSignal): Promise<AuthResponse | TwoFactorChallenge> {
     if (USE_MOCKS) {
       if (request.email !== "admin@cashout.dev" || request.password !== "admin123") {
         throw new ApiError({ kind: "http", status: 401 })
@@ -30,10 +31,17 @@ export const authService = {
       return MOCK_AUTH
     }
 
-    const { data } = await http.post<AuthResponse>("/auth/login", request, {
+    const { data } = await http.post<AuthResponse | TwoFactorChallenge>("/auth/login", request, {
       skipAuthRefresh: true,
       signal,
     })
+    if (!isTwoFactorChallenge(data)) tokenStore.setSession(data)
+    return data
+  },
+
+  /** El segundo paso: el desafio y el codigo de la app (o uno de recuperacion). Abre la sesion. */
+  async verifyTwoFactor(challenge: string, code: string, signal?: AbortSignal): Promise<AuthResponse> {
+    const { data } = await http.post<AuthResponse>("/auth/2fa/verify", { challenge, code }, { skipAuthRefresh: true, signal })
     tokenStore.setSession(data)
     return data
   },

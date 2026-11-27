@@ -9,8 +9,9 @@ export const whatsappService = {
   },
 
   /** Un codigo nuevo para mandar desde WhatsApp; vale 15 minutos y el anterior deja de servir. */
-  async link(): Promise<WhatsAppStatus> {
-    const { data } = await http.post<WhatsAppStatus>("/whatsapp/link")
+  /** Con verificacion en dos pasos, el backend pide tambien su codigo. */
+  async link(twoFactorCode?: string): Promise<WhatsAppStatus> {
+    const { data } = await http.post<WhatsAppStatus>("/whatsapp/link", twoFactorCode ? { twoFactorCode } : undefined)
     return data
   },
 

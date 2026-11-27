@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useTwoFactorPrompt } from "@/components/auth/TwoFactorPrompt"
 import { View } from "react-native"
 import * as Clipboard from "expo-clipboard"
 import { userMessage, toApiError } from "@/api/errors"
@@ -25,6 +26,7 @@ const STEPS = [
 ]
 
 export default function ShortcutScreen() {
+  const { ask: askCode, sheet: codeSheet } = useTwoFactorPrompt()
   const colors = usePalette()
   const toast = useToast()
   const status = useApiQuery(["ingest-token"], (signal) => autoRegisterService.tokenStatus(signal))
@@ -42,9 +44,12 @@ export default function ShortcutScreen() {
       })
       if (!ok) return
     }
+    // El token del atajo sobrevive a cerrar las sesiones: con 2FA, pide el codigo.
+    const code = await askCode("crear el token del atajo")
+    if (code === null) return
     setBusy(true)
     try {
-      setFresh((await autoRegisterService.newToken()).token)
+      setFresh((await autoRegisterService.newToken(code)).token)
       setCopied(false)
       status.reload()
     } catch (err) {
@@ -133,6 +138,7 @@ export default function ShortcutScreen() {
         ))}
         <Text tone="muted" className="text-[13px] leading-5">Solo funciona en iPhone con Apple Pay. En Android, usa los correos del banco.</Text>
       </View>
+      {codeSheet}
     </Screen>
   )
 }

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react"
+import { useTwoFactorPrompt } from "@/components/auth/TwoFactorPrompt"
 import { Linking, View } from "react-native"
 import { useFocusEffect } from "expo-router"
 import { toApiError, userMessage } from "@/api/errors"
@@ -21,6 +22,7 @@ const POLL_MS = 4000
 
 /** Vincular WhatsApp: escribes tus gastos por chat y Cash-Out los anota. */
 export default function WhatsAppScreen() {
+  const { ask: askCode, sheet: codeSheet } = useTwoFactorPrompt()
   const toast = useToast()
   const status = useApiQuery(["whatsapp"], (signal) => whatsappService.status(signal))
   const [fresh, setFresh] = useState<WhatsAppStatus | null>(null)
@@ -70,9 +72,12 @@ export default function WhatsAppScreen() {
   }
 
   const link = async () => {
+    // Un numero vinculado sobrevive a cerrar las sesiones: con 2FA, pide el codigo.
+    const code = await askCode("vincular tu WhatsApp")
+    if (code === null) return
     setBusy(true)
     try {
-      setFresh(await whatsappService.link())
+      setFresh(await whatsappService.link(code))
       setAnnounced(false)
       setNow(Date.now())
       status.reload()
@@ -158,6 +163,7 @@ export default function WhatsAppScreen() {
           </Text>
         ))}
       </View>
+      {codeSheet}
     </Screen>
   )
 }

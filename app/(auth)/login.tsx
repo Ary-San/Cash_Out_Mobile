@@ -6,6 +6,7 @@ import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toApiError, userMessage } from "@/api/errors"
 import type { SessionEndReason } from "@/api/tokenStore"
+import { TwoFactorStep } from "@/components/auth/TwoFactorStep"
 import { Button } from "@/components/ui/Button"
 import { Field } from "@/components/ui/Field"
 import { Notice } from "@/components/ui/Notice"
@@ -20,7 +21,7 @@ const END_REASON_MESSAGES: Record<SessionEndReason, string> = {
 }
 
 export default function LoginScreen() {
-  const { login, endReason } = useAuth()
+  const { login, endReason, twoFactorChallenge } = useAuth()
   const [formError, setFormError] = useState<string | null>(null)
 
   const form = useForm<LoginValues>({
@@ -54,6 +55,11 @@ export default function LoginScreen() {
           contentContainerClassName="w-full max-w-[480px] flex-grow justify-center gap-7 self-center px-6 py-8"
           keyboardShouldPersistTaps="handled"
         >
+          {twoFactorChallenge ? (
+            // La contrasena ya paso: falta el codigo de la app autenticadora.
+            <TwoFactorStep />
+          ) : (
+          <>
           <View className="gap-2">
             {/* "Hola de nuevo" no le sirve a quien recien llega (auditoria UX-03). */}
             <Title size="xl">Hola</Title>
@@ -120,6 +126,8 @@ export default function LoginScreen() {
               ¿No tienes cuenta? <Text weight="semibold" className="text-sm">Créala</Text>
             </Text>
           </Pressable>
+          </>
+          )}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

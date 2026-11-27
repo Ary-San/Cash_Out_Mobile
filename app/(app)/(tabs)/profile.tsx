@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from "react"
 import { Pressable, View } from "react-native"
 import { router, useFocusEffect } from "expo-router"
-import { KeyRound, Mail, MessageCircle, Smartphone, Sparkles, Trash2, UserRound } from "lucide-react-native"
+import { KeyRound, Mail, MessageCircle, MonitorSmartphone, ShieldCheck, Smartphone, Sparkles, Trash2, UserRound } from "lucide-react-native"
 import { BiometricsRow } from "@/components/profile/BiometricsRow"
 import { DeleteAccountSheet } from "@/components/profile/DeleteAccountSheet"
 import { SettingsGroup, SettingsRow } from "@/components/profile/SettingsGroup"
@@ -91,6 +91,21 @@ export default function ProfileScreen() {
           ) : (
             <SettingsRow icon={KeyRound} label="Contraseña" description="Al cambiarla, se cierran tus otras sesiones" onPress={() => router.push("/settings/password")} />
           )}
+          {user.googleOnly ? null : (
+            <SettingsRow
+              icon={ShieldCheck}
+              label="Verificación en dos pasos"
+              description="Un código de tu app autenticadora al entrar"
+              status={{ label: user.twoFactorEnabled ? "Activa" : "Inactiva", on: !!user.twoFactorEnabled }}
+              onPress={() => router.push("/settings/two-factor")}
+            />
+          )}
+          <SettingsRow
+            icon={MonitorSmartphone}
+            label="Sesiones activas"
+            description="Dónde está abierta tu cuenta; cierra las que no reconozcas"
+            onPress={() => router.push("/settings/sessions")}
+          />
           <BiometricsRow />
         </SettingsGroup>
 

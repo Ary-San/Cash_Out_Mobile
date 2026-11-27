@@ -4,6 +4,8 @@ import axios, {
   type AxiosInstance,
   type InternalAxiosRequestConfig,
 } from "axios"
+import { Platform } from "react-native"
+import * as Device from "expo-device"
 import { API_URL } from "@/config"
 import type { AuthResponse } from "@/types/auth"
 import { ApiError, toApiError } from "./errors"
@@ -37,7 +39,8 @@ export function createApiClient({ baseURL, timeoutMs = 15_000, adapter }: ApiCli
   const defaults = {
     baseURL,
     timeout: timeoutMs,
-    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    // X-Cashout-Client: asi "Sesiones activas" dice "App Cash-Out en Android (Pixel 7)" y no "okhttp".
+    headers: { "Content-Type": "application/json", Accept: "application/json", "X-Cashout-Client": clientLabel() },
     adapter,
   }
 
@@ -114,3 +117,9 @@ export function createApiClient({ baseURL, timeoutMs = 15_000, adapter }: ApiCli
 export const api = createApiClient({ baseURL: API_URL })
 
 export const http = api.http
+
+/** "android; Pixel 7": el sistema y el modelo, para nombrar la sesion. Sin datos personales. */
+function clientLabel(): string {
+  const model = (Device.modelName ?? "").replace(/[^\w .()-]/g, "").slice(0, 40)
+  return `${Platform.OS}; ${model}`.trim()
+}
