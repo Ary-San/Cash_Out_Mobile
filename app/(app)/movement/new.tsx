@@ -6,6 +6,8 @@ import { Segmented } from "@/components/ui/Segmented"
 import { useToast } from "@/components/ui/Toast"
 import { expenseService } from "@/services/expenseService"
 import { incomeService } from "@/services/incomeService"
+import { haptics } from "@/lib/haptics"
+import { tokensEarnedNote } from "@/lib/market"
 import type { ExpenseInput, IncomeInput } from "@/types/movements"
 
 type Kind = "EXPENSE" | "INCOME"
@@ -21,9 +23,10 @@ export default function NewMovementScreen() {
   const toast = useToast()
 
   const save = async (input: ExpenseInput | IncomeInput) => {
-    if (kind === "EXPENSE") await expenseService.create(input as ExpenseInput)
-    else await incomeService.create(input as IncomeInput)
-    toast(kind === "EXPENSE" ? "Gasto guardado" : "Ingreso guardado")
+    const saved = kind === "EXPENSE" ? await expenseService.create(input as ExpenseInput) : await incomeService.create(input as IncomeInput)
+    // Anotar paga fichas (con tope diario): se avisa en el mismo mensaje.
+    if (saved.tokensEarned) haptics.success()
+    toast(`${kind === "EXPENSE" ? "Gasto guardado" : "Ingreso guardado"}${tokensEarnedNote(saved.tokensEarned)}`)
     router.back()
   }
 

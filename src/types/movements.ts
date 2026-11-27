@@ -19,6 +19,8 @@ export interface Expense {
   date: string
   description: string | null
   createdAt: string
+  /** Fichas que gano al anotarlo; solo viene al crear. */
+  tokensEarned?: number | null
 }
 
 /** ExpenseRequest */
@@ -38,6 +40,8 @@ export interface Income {
   date: string
   description: string | null
   createdAt: string
+  /** Fichas que gano al anotarlo; solo viene al crear. */
+  tokensEarned?: number | null
 }
 
 /** IncomeRequest */

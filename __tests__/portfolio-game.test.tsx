@@ -35,7 +35,7 @@ const sectors = [
   { key: "tech", name: "Tecnología", symbol: "XLK", kind: "Crecimiento", description: "Software y chips." },
   { key: "bonds", name: "Bonos", symbol: "AGG", kind: "Defensivo", description: "Deuda de alta calidad." },
 ]
-const me = { id: 1, rank: 1, name: "Valeria", ready: false, weights: null, result: null, me: true }
+const me = { id: 1, rank: 1, name: "Valeria", ready: false, weights: null, result: null, me: true, prize: 0 }
 const lobby: PortfolioGameView = {
   code: "P4RT01", phase: "LOBBY", host: false, joined: true, maxPlayers: 40, startValue: 10000, step: 0, totalSteps: 5,
   sectors, stages: [], ranking: [me], me, benchmark: null,

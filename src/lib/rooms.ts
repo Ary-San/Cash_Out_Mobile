@@ -3,6 +3,10 @@ import { toApiError } from "@/api/errors"
 import { API_URL } from "@/config"
 
 /** Los juegos en grupo de la app, con su ruta en la web, su API y su pantalla en la app. */
+/** El podio de las salas por puntos (Sube o baja y Arma tu portafolio); hace falta al menos otro jugador. */
+export const ROOM_PODIUM = [30, 20, 10] as const
+export const ROOM_PRIZE_MIN_PLAYERS = 2
+
 export const ROOM_GAMES = {
   updown: { name: "¿Sube o baja?", webPath: "minijuegos/sube-o-baja", api: "/updown-rooms", screen: "/games/updown/[code]" },
   portfolio: { name: "Arma tu portafolio", webPath: "minijuegos/arma-tu-portafolio", api: "/portfolio-rooms", screen: "/games/portfolio/[code]" },

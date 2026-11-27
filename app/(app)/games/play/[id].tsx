@@ -114,7 +114,7 @@ export default function MinigamePlayScreen() {
             {data.tokenCost > 0 ? " El costo se descuenta cuando terminas la partida." : ""}
           </Text>
           {unknownBalance && wallet.error ? <ErrorState error={wallet.error} onRetry={wallet.reload} /> : null}
-          {missing > 0 ? <Notice tone="error">{`Te faltan ${formatTokens(missing)} para jugar. Ganas fichas cumpliendo tus metas de ahorro o con los juegos gratis.`}</Notice> : null}
+          {missing > 0 ? <Notice tone="error">{`Te faltan ${formatTokens(missing)} para jugar. Ganas fichas anotando tus movimientos, cumpliendo metas, en el podio de las salas o con los juegos gratis.`}</Notice> : null}
           <Button label="Empezar partida" disabled={missing > 0 || wallet.isLoading || unknownBalance} onPress={() => setPhase({ name: "playing", run: prepareRun(pack) })} />
         </Card>
       ) : phase.name === "playing" ? (

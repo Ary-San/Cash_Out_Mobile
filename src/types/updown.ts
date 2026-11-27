@@ -43,6 +43,8 @@ export interface UpDownPlayer {
   /** Lo que gano o perdio en la ronda revelada. */
   delta: number
   me: boolean
+  /** Fichas que gano por su puesto; 0 hasta terminar. */
+  prize: number
 }
 
 /** UpDownView: el estado de la sala visto por quien pregunta (anfitrion, jugador o ambos). */

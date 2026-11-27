@@ -23,7 +23,7 @@ const api = updownService as jest.Mocked<typeof updownService>
 const METRICS = { frame: { x: 0, y: 0, width: 375, height: 812 }, insets: { top: 0, left: 0, right: 0, bottom: 0 } }
 const wrap = (node: React.ReactElement) => <SafeAreaProvider initialMetrics={METRICS}>{node}</SafeAreaProvider>
 
-const player = { id: 1, rank: 1, name: "Valeria", points: 1000, hits: 0, voted: false, choice: null, bet: 0, delta: 0, me: true }
+const player = { id: 1, rank: 1, name: "Valeria", points: 1000, hits: 0, voted: false, choice: null, bet: 0, delta: 0, me: true, prize: 0 }
 const base: UpDownView = {
   code: "K7M2QX", phase: "LOBBY", host: false, joined: false, maxPlayers: 40, startPoints: 1000, minBet: 10,
   round: 0, totalRounds: 8, secondsLeft: 0, votingSeconds: 20, question: null,
@@ -90,5 +90,18 @@ describe("¿Sube o baja?: salas", () => {
     await fireEvent.press(screen.getByText("Confirmar apuesta"))
     await waitFor(() => expect(api.vote).toHaveBeenCalledWith("K7M2QX", "UP", 250))
     expect(await screen.findByText("Apostaste 250 pts a que sube")).toBeTruthy()
+  })
+
+  it("al terminar muestra las fichas del podio, y quien jugo solo sabe por que no gano", async () => {
+    const winner = { ...player, points: 1400, hits: 6, prize: 30 }
+    roomSends({ ...base, phase: "FINISHED", joined: true, ranking: [winner, { ...player, id: 2, rank: 2, name: "Ana", me: false, prize: 20 }], me: winner })
+    const first = await render(wrap(<UpDownRoomScreen />))
+    expect(await screen.findByText("+30.00 fichas")).toBeTruthy()
+    await first.unmount()
+
+    const alone = { ...player, prize: 0 }
+    roomSends({ ...base, phase: "FINISHED", joined: true, ranking: [alone], me: alone })
+    await render(wrap(<UpDownRoomScreen />))
+    expect(await screen.findByText("Jugaste solo: el podio gana fichas desde 2 jugadores")).toBeTruthy()
   })
 })

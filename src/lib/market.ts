@@ -37,6 +37,11 @@ export function formatTokens(value: number | null | undefined): string {
   return `${two.format(value)} fichas`
 }
 
+/** " · +15 fichas" para sumar al aviso de un movimiento guardado; vacio si no gano nada. */
+export function tokensEarnedNote(tokens: number | null | undefined): string {
+  return tokens && tokens > 0 ? ` · +${two.format(tokens)} fichas` : ""
+}
+
 /** 12.5 → "+12.50"; sin la palabra fichas. */
 export function formatSigned(value: number | null | undefined): string {
   if (value === null || value === undefined) return "—"

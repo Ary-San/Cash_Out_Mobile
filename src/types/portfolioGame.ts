@@ -44,6 +44,8 @@ export interface PortfolioGamePlayer {
   weights: Weights | null
   result: PortfolioResult | null
   me: boolean
+  /** Fichas que gano por su puesto; 0 hasta terminar. */
+  prize: number
 }
 
 /** PortfolioGameView: el estado de la sala visto por quien pregunta. */

@@ -24,14 +24,14 @@ const GAMES: { game: RoomGame; icon: LucideIcon; pitch: string; detail: string; 
     game: "updown",
     icon: TrendingUp,
     pitch: "Noticias reales: apuesta qué hizo el mercado el mes siguiente.",
-    detail: "8 rondas de 20 segundos. Empiezas con 1000 puntos y apuestas lo que quieras.",
+    detail: "8 rondas de 20 segundos. Empiezas con 1000 puntos y apuestas lo que quieras. El podio gana 30, 20 y 10 fichas.",
     create: updownService.create,
   },
   {
     game: "portfolio",
     icon: ChartPie,
     pitch: "Reparte tu dinero entre 8 sectores y míralo pasar por 5 semestres reales.",
-    detail: "Gana el mejor rendimiento ajustado por riesgo, no el que más arriesga.",
+    detail: "Gana el mejor rendimiento ajustado por riesgo, no el que más arriesga. El podio gana 30, 20 y 10 fichas.",
     create: portfolioGameService.create,
   },
   {

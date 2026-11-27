@@ -1,4 +1,5 @@
 import { memo, useEffect, useRef } from "react"
+import { RoomPrize } from "@/components/games/RoomPrize"
 import { router, useLocalSearchParams, useNavigation, usePreventRemove } from "expo-router"
 import { useKeepAwake } from "expo-keep-awake"
 import { View } from "react-native"
@@ -209,7 +210,7 @@ function JoinCard({ view, busy, onJoin }: { view: UpDownView; busy: boolean; onJ
           : `El juego ya empezó (ronda ${view.round} de ${view.totalRounds}), pero todavía puedes entrar con ${formatPoints(view.startPoints)} puntos.`}
       </Text>
       <Button label="Entrar a la sala" loading={busy} onPress={onJoin} />
-      <Text tone="muted" className="text-xs">Es gratis: se juegan puntos de la sala, no fichas.</Text>
+      <Text tone="muted" className="text-xs">Es gratis. Al terminar, el podio gana 30, 20 y 10 fichas si juegan 2 o más.</Text>
     </Card>
   )
 }
@@ -277,6 +278,7 @@ function Final({ view }: { view: UpDownView }) {
             de {view.ranking.length}, con {formatPoints(me.points)} puntos y {me.hits} de {view.totalRounds} aciertos.
           </Text>
         ) : null}
+        {me ? <RoomPrize prize={me.prize} players={view.ranking.length} /> : null}
         <UpDownRanking ranking={view.ranking} />
       </Card>
       {view.history.length > 0 ? (

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react"
+import { RoomPrize } from "@/components/games/RoomPrize"
 import { View } from "react-native"
 import { router, useLocalSearchParams, useNavigation, usePreventRemove } from "expo-router"
 import { useKeepAwake } from "expo-keep-awake"
@@ -190,7 +191,7 @@ function JoinCard({ busy, onJoin }: { busy: boolean; onJoin: () => void }) {
       <Title size="md">{TITLE}</Title>
       <Text tone="muted" className="text-sm leading-5">Reparte tu dinero entre 8 sectores y mira cómo le va en cinco semestres reales del mercado.</Text>
       <Button label="Entrar a la sala" loading={busy} onPress={onJoin} />
-      <Text tone="muted" className="text-xs">Es gratis: se juegan puntos de la sala, no fichas.</Text>
+      <Text tone="muted" className="text-xs">Es gratis. Al terminar, el podio gana 30, 20 y 10 fichas si juegan 2 o más.</Text>
     </Card>
   )
 }
@@ -211,6 +212,7 @@ function Simulation({ view, busy, onNext }: { view: PortfolioGameView; busy: boo
               de {view.ranking.length}, con {formatGamePoints(me.result.value)} puntos ({formatChange(me.result.returnPercent)}).
             </Text>
           ) : null}
+          {me ? <RoomPrize prize={me.prize} players={view.ranking.length} /> : null}
           {lesson ? <Text weight="medium" className="rounded-2xl bg-accent p-3 text-sm leading-5">{lesson}</Text> : null}
         </Card>
       ) : me ? (
