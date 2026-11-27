@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Pressable, View } from "react-native"
-import { TriangleAlert, X } from "lucide-react-native"
+import { Sparkles, TriangleAlert, X } from "lucide-react-native"
 import { toApiError, userMessage } from "@/api/errors"
 import { CategoryPicker } from "@/components/movements/CategoryPicker"
 import { DateField } from "@/components/movements/DateField"
@@ -11,6 +11,7 @@ import { Segmented } from "@/components/ui/Segmented"
 import { Text } from "@/components/ui/Text"
 import { useToast } from "@/components/ui/Toast"
 import { CONFIDENT, PAYMENT_LABEL, WARNING_TEXT, confirmRequest, formFromDraft, formProblem } from "@/lib/assistant"
+import { tokensEarnedNote } from "@/lib/market"
 import { assistantService } from "@/services/assistantService"
 import { usePalette } from "@/theme/palette"
 import type { Draft, DraftKind } from "@/types/assistant"
@@ -41,7 +42,7 @@ export function DraftCard({ draft, onDone }: { draft: Draft; onDone: (saved: boo
     setError(null)
     try {
       const result = await assistantService.confirm(confirmRequest(draft, form))
-      toast(`${expense ? "Gasto" : "Ingreso"} guardado${result.learned ? " · la próxima vez lo sugiero así" : ""}`)
+      toast(`${expense ? "Gasto" : "Ingreso"} guardado${tokensEarnedNote(result.tokensEarned)}${result.learned ? " · la próxima vez lo sugiero así" : ""}`)
       onDone(true)
     } catch (err) {
       setError(userMessage(toApiError(err)))
@@ -86,7 +87,15 @@ export function DraftCard({ draft, onDone }: { draft: Draft; onDone: (saved: boo
       />
       <DateField value={form.date} onChange={(date) => setForm({ ...form, date })} />
       {expense ? (
-        <CategoryPicker value={form.category} onChange={(category) => setForm({ ...form, category })} suggested={suggested} />
+        <View className="gap-1.5">
+          <CategoryPicker value={form.category} onChange={(category) => setForm({ ...form, category })} suggested={suggested} />
+          {draft.source === "CLAUDE" ? (
+            <View className="flex-row items-center gap-1.5">
+              <Sparkles size={13} color={colors.mutedForeground} />
+              <Text tone="muted" className="text-xs">Categoría sugerida por IA: revísala antes de guardar</Text>
+            </View>
+          ) : null}
+        </View>
       ) : null}
 
       {draft.warnings.length > 0 ? (

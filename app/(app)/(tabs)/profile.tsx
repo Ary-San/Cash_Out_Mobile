@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from "react"
 import { Pressable, View } from "react-native"
 import { router, useFocusEffect } from "expo-router"
-import { KeyRound, Mail, Smartphone, Trash2, UserRound } from "lucide-react-native"
+import { KeyRound, Mail, MessageCircle, Smartphone, Sparkles, Trash2, UserRound } from "lucide-react-native"
 import { BiometricsRow } from "@/components/profile/BiometricsRow"
 import { DeleteAccountSheet } from "@/components/profile/DeleteAccountSheet"
 import { SettingsGroup, SettingsRow } from "@/components/profile/SettingsGroup"
@@ -16,6 +16,7 @@ import { useAuth } from "@/hooks/useAuth"
 import { formatDateTime } from "@/lib/format"
 import { ROLE_LABEL, memberSince } from "@/lib/profile"
 import { autoRegisterService } from "@/services/autoRegisterService"
+import { whatsappService } from "@/services/whatsappService"
 import { useThemePreference, type ThemePreference } from "@/theme/themePreference"
 
 const THEMES: { value: ThemePreference; label: string }[] = [
@@ -34,6 +35,7 @@ export default function ProfileScreen() {
 
   const gmail = useApiQuery(["gmail-status", version, student], (signal) => (student ? autoRegisterService.gmailStatus(signal) : Promise.resolve(null)))
   const token = useApiQuery(["ingest-token", version, student], (signal) => (student ? autoRegisterService.tokenStatus(signal) : Promise.resolve(null)))
+  const whatsapp = useApiQuery(["whatsapp", version, student], (signal) => (student ? whatsappService.status(signal) : Promise.resolve(null)))
 
   // Al volver de un ajuste (Gmail conectado, token nuevo) los estados tienen que reflejarlo.
   const firstFocus = useRef(true)
@@ -101,6 +103,25 @@ export default function ProfileScreen() {
               description="Registra tus pagos con Apple Pay"
               status={token.data ? { label: token.data.active ? "Activo" : "Sin token", on: token.data.active } : undefined}
               onPress={() => router.push("/settings/shortcut")}
+            />
+            <SettingsRow
+              icon={MessageCircle}
+              label="WhatsApp"
+              description={whatsapp.data?.linked ? `Anotas escribiendo desde ${whatsapp.data.phone}` : "Escribe «taxi 12» por chat y se anota solo"}
+              status={whatsapp.data ? { label: whatsapp.data.linked ? "Vinculado" : "Sin vincular", on: whatsapp.data.linked } : undefined}
+              onPress={() => router.push("/settings/whatsapp")}
+            />
+          </SettingsGroup>
+        ) : null}
+
+        {student ? (
+          <SettingsGroup title="Asistente">
+            <SettingsRow
+              first
+              icon={Sparkles}
+              label="Pregúntale a Cash-Out"
+              description="Consulta tus gastos, metas y portafolio, con gráficos"
+              onPress={() => router.push("/assistant-chat")}
             />
           </SettingsGroup>
         ) : null}

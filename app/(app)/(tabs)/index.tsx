@@ -1,7 +1,7 @@
 import { useCallback, useRef } from "react"
 import { Pressable, View } from "react-native"
 import { router, useFocusEffect } from "expo-router"
-import { ChevronRight, Gamepad2 } from "lucide-react-native"
+import { ChevronRight, Sparkles } from "lucide-react-native"
 import { MovementRow } from "@/components/movements/MovementRow"
 import { BalanceCard } from "@/components/summary/BalanceCard"
 import { CategoryBars } from "@/components/summary/CategoryBars"
@@ -97,15 +97,15 @@ export default function SummaryScreen() {
         ]}
       />
 
-      {/* Un acceso a la vista: a quien le pasan un codigo de sala tiene que encontrar donde ponerlo. */}
-      <Pressable role="link" aria-label="Minijuegos: crea una sala o únete con un código" onPress={() => router.push("/games")} className="active:opacity-80">
+      {/* Minijuegos ya tiene su pestaña: aqui va el acceso al asistente, que no tiene otra entrada a la vista. */}
+      <Pressable role="link" aria-label="Pregúntale a Cash-Out: consulta tus finanzas con el asistente" onPress={() => router.push("/assistant-chat")} className="active:opacity-80">
         <Card className="min-h-14 flex-row items-center gap-3 py-3">
           <View className="size-9 items-center justify-center rounded-xl bg-accent">
-            <Gamepad2 size={18} color={colors.accentInk} />
+            <Sparkles size={18} color={colors.accentInk} />
           </View>
           <View className="flex-1">
-            <Text weight="semibold" className="text-sm">Minijuegos en grupo</Text>
-            <Text tone="muted" className="text-xs">Crea una sala o únete con un código</Text>
+            <Text weight="semibold" className="text-sm">Pregúntale a Cash-Out</Text>
+            <Text tone="muted" className="text-xs">«¿En qué gasté más este mes?» y te responde con gráficos</Text>
           </View>
           <ChevronRight size={18} color={colors.mutedForeground} />
         </Card>

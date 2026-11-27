@@ -25,13 +25,14 @@ App de finanzas personales para jóvenes: registra lo que entra y sale (en soles
 | Pantalla | Funciones |
 |---|---|
 | Bienvenida | Seda animada (shader Skia), una meta de ejemplo que se convierte en fichas, crear cuenta o entrar |
-| Resumen | Disponible, fichas, el mes por categorías, metas y últimos movimientos |
-| Movimientos | Registrar con una frase ("almuerzo 15 soles"), con el QR de una boleta SUNAT o a mano; lista virtualizada con filtros |
+| Resumen | Disponible, fichas, el mes por categorías, metas, últimos movimientos y acceso al asistente |
+| Movimientos | Registrar con una frase ("almuerzo 15 soles", la lee **Claude Haiku**), con el QR de una boleta SUNAT o a mano; lista virtualizada con filtros. Cada movimiento anotado gana fichas |
 | Metas | Crear, aportar, pronóstico de llegada, celebración al cumplir (+ fichas) |
 | Proyecciones | Interés simple vs compuesto, tasas de referencia, escenarios guardados y "proyectar esta meta" |
+| Asistente | **Pregúntale a Cash-Out**: chat con **Claude Sonnet** que responde con tus datos y dibuja gráficos de barras, líneas o torta. Solo lee: no registra ni borra |
 | Portafolio | Mercado (acciones de EE. UU. y cripto), órdenes con fichas, posiciones, noticias, favoritos |
 | Minijuegos | Salas en vivo de **¿Sube o baja?**, **Arma tu portafolio** y la **Carrera de trading**: crear la sala desde el celular (anfitrión) o entrar con el código o el QR; celular y laptop juegan en la misma sala. Además, 3 juegos de práctica de a uno (**Interés compuesto**, **Apuesta o inversión** y **Préstamos**) que pagan fichas según tu puntaje |
-| Perfil | Datos y foto, contraseña, biometría, tema, correos del banco (Gmail), atajo de iPhone, eliminar cuenta |
+| Perfil | Datos y foto, contraseña, biometría, tema, correos del banco (Gmail), atajo de iPhone, **WhatsApp** (anotar gastos por chat), eliminar cuenta |
 
 ## Tecnologías
 
@@ -64,6 +65,13 @@ App de finanzas personales para jóvenes: registra lo que entra y sale (en soles
 - **expo-keep-awake**: la pantalla no se apaga durante la partida
 - La cuota de la carrera son fichas reales: se confirma el monto y, con la biometría activa, con la huella; si son menos de 3 jugadores se devuelve
 
+### Asistente y WhatsApp
+- **IA en el backend**: las frases las lee **Claude Haiku 5.5** (monto, fecha y categoría, respetando tus correcciones) y el asistente usa **Claude Sonnet 5.5** con herramientas de solo lectura. La app nunca habla con Anthropic: solo con la API de Cash-Out
+- **El chat no se guarda**: vive en la pantalla; el backend solo lee los datos de quien pregunta y tiene un tope de preguntas por día
+- **Gráficos del asistente** con `react-native-svg` (barras horizontales, líneas y dona), con su descripción para el lector de pantalla
+- **WhatsApp (Twilio)**: en Perfil pides un código, lo mandas desde tu WhatsApp y el número queda vinculado. Desde ahí escribes "taxi 12" y se anota solo; también `SALDO`, `DESHACER` y preguntas con "?"
+- Los links `wa.me` abren WhatsApp con el mensaje listo (`Linking`)
+
 ### Juegos de práctica
 - El catálogo (costo y premio máximo) viene del backend; las preguntas y rondas viven en la app (`src/games/`), las mismas de la web
 - Cada partida mezcla el orden y las opciones; el puntaje (0 a 100) se registra al terminar y el backend cobra el costo y paga el premio en una sola operación
@@ -77,7 +85,7 @@ App de finanzas personales para jóvenes: registra lo que entra y sale (en soles
 - Token de acceso solo en memoria; refresh token en **expo-secure-store** (Keystore / Keychain)
 - Bloqueo biométrico al abrir y al volver tras 2 minutos en segundo plano
 - Órdenes idempotentes (`clientOrderId`) y confirmación de acciones destructivas
-- Sin secretos en la app: la única variable es la URL pública de la API
+- Sin secretos en la app: la única variable es la URL pública de la API. Las claves de Claude y de Twilio viven solo en el backend
 
 ### Accesibilidad
 - Roles y etiquetas en español para lectores de pantalla, áreas táctiles de 44 pt
@@ -85,7 +93,7 @@ App de finanzas personales para jóvenes: registra lo que entra y sale (en soles
 - Respeta "Reducir movimiento"; ancho máximo en tablet
 
 ### Calidad
-- **Jest 30** + **React Native Testing Library 14** (109 pruebas), **ESLint** (`expo lint`) y `tsc`
+- **Jest 30** + **React Native Testing Library 14** (122 pruebas), **ESLint** (`expo lint`) y `tsc`
 
 ## Estructura
 
@@ -94,7 +102,7 @@ app/                 rutas (expo-router)
   (auth)/            bienvenida, login, registro
   (app)/(tabs)/      resumen, movimientos, metas, portafolio, perfil y minijuegos
   (app)/games/       las salas en vivo (sube o baja, portafolio, carrera), los juegos de práctica y el escáner de salas
-  (app)/...          detalle de meta, activo, movimiento, proyección, ajustes, escáner de boletas
+  (app)/...          detalle de meta, activo, movimiento, proyección, asistente, ajustes (Gmail, atajo, WhatsApp), escáner de boletas
 src/
   api/               cliente axios, errores, almacenamiento de tokens
   services/          una capa por recurso del backend

@@ -26,7 +26,7 @@ export interface Draft {
   /** De 0 a 1. */
   confidence: number
   alternatives: { category: ExpenseCategory; probability: number }[]
-  source: "USER_RULE" | "JEV" | "KEYWORDS"
+  source: "USER_RULE" | "CLAUDE" | "JEV" | "KEYWORDS"
   warnings: DraftWarning[]
   /** RUC del comercio, si vino de una boleta. */
   ruc: string | null
@@ -51,4 +51,6 @@ export interface ConfirmDraftResponse {
   kind: DraftKind
   id: number
   learned: boolean
+  /** Fichas que gano al anotarlo. */
+  tokensEarned?: number | null
 }
