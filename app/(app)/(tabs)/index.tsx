@@ -1,7 +1,7 @@
 import { useCallback, useRef } from "react"
 import { Pressable, View } from "react-native"
 import { router, useFocusEffect } from "expo-router"
-import { ChevronRight, Sparkles } from "lucide-react-native"
+import { ChevronRight, HandCoins, Sparkles } from "lucide-react-native"
 import { MovementRow } from "@/components/movements/MovementRow"
 import { BalanceCard } from "@/components/summary/BalanceCard"
 import { BudgetsCard } from "@/components/summary/BudgetsCard"
@@ -115,6 +115,19 @@ export default function SummaryScreen() {
           <View className="flex-1">
             <Text weight="semibold" className="text-sm">Pregúntale a Cash-Out</Text>
             <Text tone="muted" className="text-xs">«¿En qué gasté más este mes?» y te responde con gráficos</Text>
+          </View>
+          <ChevronRight size={18} color={colors.mutedForeground} />
+        </Card>
+      </Pressable>
+
+      <Pressable role="link" aria-label="Cuentas compartidas: quién te debe y a quién le debes" onPress={() => router.push("/split-bills")} className="active:opacity-80">
+        <Card className="min-h-14 flex-row items-center gap-3 py-3">
+          <View className="size-9 items-center justify-center rounded-xl bg-muted">
+            <HandCoins size={18} color={colors.foreground} />
+          </View>
+          <View className="flex-1">
+            <Text weight="semibold" className="text-sm">Cuentas compartidas</Text>
+            <Text tone="muted" className="text-xs">Divide la cena o el taxi y recuerda por WhatsApp</Text>
           </View>
           <ChevronRight size={18} color={colors.mutedForeground} />
         </Card>

@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Pressable, View } from "react-native"
+import { router } from "expo-router"
 import { Sparkles, TriangleAlert, X } from "lucide-react-native"
 import { toApiError, userMessage } from "@/api/errors"
 import { CategoryPicker } from "@/components/movements/CategoryPicker"
@@ -10,9 +11,11 @@ import { Field } from "@/components/ui/Field"
 import { Segmented } from "@/components/ui/Segmented"
 import { Text } from "@/components/ui/Text"
 import { useToast } from "@/components/ui/Toast"
-import { CONFIDENT, PAYMENT_LABEL, WARNING_TEXT, confirmRequest, formFromDraft, formProblem } from "@/lib/assistant"
+import { CONFIDENT, PAYMENT_LABEL, WARNING_TEXT, confirmRequest, formFromDraft, formProblem, type DraftForm } from "@/lib/assistant"
+import { confirmAction } from "@/lib/confirm"
 import { tokensEarnedNote } from "@/lib/market"
 import { assistantService } from "@/services/assistantService"
+import { splitService } from "@/services/splitService"
 import { usePalette } from "@/theme/palette"
 import type { Draft, DraftKind } from "@/types/assistant"
 
@@ -22,7 +25,7 @@ const KINDS: { value: DraftKind; label: string }[] = [
 ]
 
 /** Una tarjeta que el usuario revisa antes de guardar: todo se puede cambiar. */
-export function DraftCard({ draft, onDone }: { draft: Draft; onDone: (saved: boolean) => void }) {
+export function DraftCard({ draft, onDone, message }: { draft: Draft; onDone: (saved: boolean) => void; message?: string }) {
   const [form, setForm] = useState(() => formFromDraft(draft))
   const [touched, setTouched] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -44,6 +47,7 @@ export function DraftCard({ draft, onDone }: { draft: Draft; onDone: (saved: boo
       const result = await assistantService.confirm(confirmRequest(draft, form))
       toast(`${expense ? "Gasto" : "Ingreso"} guardado${tokensEarnedNote(result.tokensEarned)}${result.learned ? " · la próxima vez lo sugiero así" : ""}`)
       onDone(true)
+      if (expense && draft.warnings.includes("NOT_SPLIT") && draft.currency === "PEN") void offerSplit(result.id, form, message)
     } catch (err) {
       setError(userMessage(toApiError(err)))
       setSaving(false)
@@ -117,8 +121,24 @@ export function DraftCard({ draft, onDone }: { draft: Draft; onDone: (saved: boo
   )
 }
 
+/** Se guardo el total de "cena 120 entre 4": se ofrece dividirlo con los nombres de la frase. */
+async function offerSplit(expenseId: number, form: DraftForm, message: string | undefined) {
+  const ok = await confirmAction({
+    title: "¿Dividir este gasto?",
+    message: "Se guardó el total. Si lo divides, te avisamos cuánto te debe cada uno y te dejamos el recordatorio por WhatsApp.",
+    confirmLabel: "Dividir",
+    cancelLabel: "Ahora no",
+  })
+  if (!ok) return
+  const names = message ? await splitService.hint(message).then((hint) => hint.names).catch(() => []) : []
+  router.push({
+    pathname: "/split-new",
+    params: { expenseId, amount: form.amount, description: form.description, category: form.category ?? "OTHER", names: names.join("|") },
+  })
+}
+
 /** Las tarjetas de una frase o una boleta; cada una se va al guardarla o descartarla. */
-export function DraftList({ drafts, onSaved }: { drafts: Draft[]; onSaved: () => void }) {
+export function DraftList({ drafts, onSaved, message }: { drafts: Draft[]; onSaved: () => void; message?: string }) {
   const [open, setOpen] = useState(() => drafts.map((draft, index) => ({ draft, key: index })))
 
   return (
@@ -127,6 +147,7 @@ export function DraftList({ drafts, onSaved }: { drafts: Draft[]; onSaved: () =>
         <DraftCard
           key={key}
           draft={draft}
+          message={message}
           onDone={(saved) => {
             setOpen((cards) => cards.filter((card) => card.key !== key))
             if (saved) onSaved()

@@ -14,7 +14,7 @@ import type { Draft } from "@/types/assistant"
 export function PhraseComposer({ onSaved }: { onSaved: () => void }) {
   const [text, setText] = useState("")
   const [reading, setReading] = useState(false)
-  const [result, setResult] = useState<{ drafts: Draft[]; id: number } | null>(null)
+  const [result, setResult] = useState<{ drafts: Draft[]; id: number; message: string } | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const read = async () => {
@@ -23,7 +23,7 @@ export function PhraseComposer({ onSaved }: { onSaved: () => void }) {
     setReading(true)
     setError(null)
     try {
-      setResult({ drafts: await assistantService.drafts({ text: phrase }), id: Date.now() })
+      setResult({ drafts: await assistantService.drafts({ text: phrase }), id: Date.now(), message: phrase })
       setText("")
     } catch (err) {
       setError(userMessage(toApiError(err)))
@@ -53,7 +53,7 @@ export function PhraseComposer({ onSaved }: { onSaved: () => void }) {
           No encontramos ningún gasto ni ingreso en esa frase. Prueba con algo como &quot;almuerzo 15&quot;.
         </Text>
       ) : null}
-      {result && result.drafts.length > 0 ? <DraftList key={result.id} drafts={result.drafts} onSaved={onSaved} /> : null}
+      {result && result.drafts.length > 0 ? <DraftList key={result.id} drafts={result.drafts} onSaved={onSaved} message={result.message} /> : null}
     </View>
   )
 }

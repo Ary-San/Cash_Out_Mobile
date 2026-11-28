@@ -73,6 +73,18 @@ export default function MovementDetailScreen() {
       {query.data ? (
         <>
           <MovementForm kind={expense ? "EXPENSE" : "INCOME"} initial={query.data} submitLabel="Guardar cambios" onSubmit={save} />
+          {expense ? (
+            <Button
+              label="Dividir este gasto"
+              variant="outline"
+              onPress={() =>
+                router.push({
+                  pathname: "/split-new",
+                  params: { expenseId: id, amount: query.data?.amount ?? "", description: query.data?.description ?? "", category: query.data?.category ?? "OTHER" },
+                })
+              }
+            />
+          ) : null}
           {deleteError ? <Notice tone="error">{deleteError}</Notice> : null}
           <Button
             label={confirming ? `Toca otra vez para borrar el ${noun}` : `Borrar ${noun}`}
