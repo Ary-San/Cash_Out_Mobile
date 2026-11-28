@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react-native"
 import { ApiError } from "@/api/errors"
 import { financeService } from "@/services/financeService"
+import { budgetService } from "@/services/budgetService"
 import { goalService } from "@/services/goalService"
 import { movementService } from "@/services/movementService"
 import { todayIso } from "@/lib/dates"
@@ -9,6 +10,9 @@ import SummaryScreen from "../app/(app)/(tabs)/index"
 jest.mock("@/services/financeService", () => ({ financeService: { savings: jest.fn(), wallet: jest.fn() } }))
 jest.mock("@/services/goalService", () => ({ goalService: { list: jest.fn() } }))
 jest.mock("@/services/movementService", () => ({ movementService: { list: jest.fn(), month: jest.fn() } }))
+jest.mock("@/services/budgetService", () => ({ budgetService: { list: jest.fn() } }))
+// La campanita consulta su contador por su lado; aqui no importa.
+jest.mock("@/components/summary/NotificationBell", () => ({ NotificationBell: () => null }))
 jest.mock("@/hooks/useAuth", () => ({ useAuth: () => ({ user: { name: "Valeria Demo" } }) }))
 jest.mock("expo-router", () => ({ router: { push: jest.fn() }, useFocusEffect: jest.fn() }))
 
@@ -23,6 +27,7 @@ const tottus = { id: 7, kind: "EXPENSE" as const, label: "Tottus", category: "FO
 beforeEach(() => {
   jest.resetAllMocks()
   finance.savings.mockResolvedValue(savings)
+  jest.mocked(budgetService.list).mockResolvedValue([])
   finance.wallet.mockResolvedValue({ id: 1, tokenBalance: 120, updatedAt: today })
   goalsApi.list.mockResolvedValue([
     { id: 1, name: "Laptop", targetAmount: 1000, accumulatedAmount: 200, progressPercent: 20, deadline: "2099-05-01",

@@ -1,15 +1,22 @@
 import { useCallback, useRef, useState } from "react"
 import { Pressable, View } from "react-native"
 import { router, useFocusEffect } from "expo-router"
-import { Plus, ReceiptText, ScanLine } from "lucide-react-native"
+import { Download, Plus, ReceiptText, ScanLine } from "lucide-react-native"
+import { toApiError, userMessage } from "@/api/errors"
 import { PhraseComposer } from "@/components/assistant/PhraseComposer"
 import { MovementRow } from "@/components/movements/MovementRow"
 import { Button } from "@/components/ui/Button"
 import { Card } from "@/components/ui/Card"
 import { ListScreen } from "@/components/ui/Screen"
 import { Segmented } from "@/components/ui/Segmented"
+import { Sheet } from "@/components/ui/Sheet"
+import { Text } from "@/components/ui/Text"
+import { useToast } from "@/components/ui/Toast"
 import { EmptyState, ErrorState, Skeleton } from "@/components/ui/States"
 import { useApiQuery } from "@/hooks/useApiQuery"
+import { todayIso } from "@/lib/dates"
+import { monthTitle, shareMonthCsv, shareMonthPdf } from "@/lib/monthExport"
+import { monthOf } from "@/lib/monthPace"
 import { expenseToMovement, incomeToMovement, movementKey, type MovementFilter } from "@/lib/movements"
 import { expenseService } from "@/services/expenseService"
 import { incomeService } from "@/services/incomeService"
@@ -29,6 +36,21 @@ export default function MovementsScreen() {
   // "Ver más" pide la lista mas larga de una vez: asi no hay paginas que juntar ni repetidos.
   const [pages, setPages] = useState(1)
   const colors = usePalette()
+  const toast = useToast()
+  const [exporting, setExporting] = useState(false)
+  const [busy, setBusy] = useState<"csv" | "pdf" | null>(null)
+  const month = monthOf(todayIso())
+
+  const exportMonth = async (kind: "csv" | "pdf") => {
+    setBusy(kind)
+    try {
+      await (kind === "csv" ? shareMonthCsv(month) : shareMonthPdf(month))
+      setExporting(false)
+    } catch (err) {
+      toast(err instanceof Error && !("isAxiosError" in err) ? err.message : userMessage(toApiError(err)))
+    }
+    setBusy(null)
+  }
 
   const query = useApiQuery(["movements", filter, pages], async (signal) => {
     const params = { page: 0, size: PAGE * pages, sort: "date,desc" }
@@ -84,6 +106,14 @@ export default function MovementsScreen() {
         <View className="flex-row gap-2">
           <Pressable
             role="button"
+            aria-label="Exportar el mes"
+            onPress={() => setExporting(true)}
+            className="size-11 items-center justify-center rounded-full border border-border"
+          >
+            <Download size={20} color={colors.foreground} />
+          </Pressable>
+          <Pressable
+            role="button"
             aria-label="Escanear boleta"
             onPress={() => router.push("/scan")}
             className="size-11 items-center justify-center rounded-full border border-border"
@@ -102,6 +132,12 @@ export default function MovementsScreen() {
       }
     >
       <PhraseComposer onSaved={reload} />
+
+      <Sheet visible={exporting} onClose={() => setExporting(false)} title={`Exportar ${monthTitle(month).toLowerCase()}`} locked={busy !== null}>
+        <Text tone="muted" className="text-sm leading-5">Todos los movimientos del mes. El CSV abre en Excel o Google Sheets; el PDF trae los totales y tus presupuestos.</Text>
+        <Button label="CSV para Excel" variant="outline" loading={busy === "csv"} disabled={busy === "pdf"} onPress={() => void exportMonth("csv")} />
+        <Button label="PDF del mes" loading={busy === "pdf"} disabled={busy === "csv"} onPress={() => void exportMonth("pdf")} />
+      </Sheet>
 
       <Segmented
         label="Filtrar movimientos"

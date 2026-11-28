@@ -4,9 +4,11 @@ import { router, useFocusEffect } from "expo-router"
 import { ChevronRight, Sparkles } from "lucide-react-native"
 import { MovementRow } from "@/components/movements/MovementRow"
 import { BalanceCard } from "@/components/summary/BalanceCard"
+import { BudgetsCard } from "@/components/summary/BudgetsCard"
 import { CategoryBars } from "@/components/summary/CategoryBars"
 import { GoalsCard } from "@/components/summary/GoalsCard"
 import { MonthCard } from "@/components/summary/MonthCard"
+import { NotificationBell } from "@/components/summary/NotificationBell"
 import { ACTION_ICONS, FirstSteps, QuickActions, TokenChip } from "@/components/summary/SummaryActions"
 import { Card } from "@/components/ui/Card"
 import { Screen } from "@/components/ui/Screen"
@@ -19,6 +21,7 @@ import { firstName, longToday } from "@/lib/format"
 import { nearestGoals } from "@/lib/goalPace"
 import { monthOf, monthPace, previousMonthOf } from "@/lib/monthPace"
 import { movementKey } from "@/lib/movements"
+import { budgetService } from "@/services/budgetService"
 import { financeService } from "@/services/financeService"
 import { goalService } from "@/services/goalService"
 import { movementService } from "@/services/movementService"
@@ -50,8 +53,9 @@ export default function SummaryScreen() {
   const recent = useApiQuery(["recent"], (signal) => movementService.list({ page: 0, size: 5, sort: "date,desc" }, signal))
   const current = useApiQuery(["month", month], (signal) => movementService.month(month, signal))
   const previous = useApiQuery(["month", previousMonth], (signal) => movementService.month(previousMonth, signal))
+  const budgets = useApiQuery(["budgets"], (signal) => budgetService.list(signal))
 
-  const queries = [savings, wallet, goals, recent, current, previous]
+  const queries = [savings, wallet, goals, recent, current, previous, budgets]
   const reloadAll = () => queries.forEach((query) => query.reload())
   const refreshing = queries.some((query) => query.isRefreshing)
 
@@ -74,7 +78,12 @@ export default function SummaryScreen() {
     <Screen
       title={`Hola, ${firstName(user?.name)}`}
       subtitle={longToday()}
-      action={wallet.data ? <TokenChip balance={wallet.data.tokenBalance} /> : null}
+      action={
+        <View className="flex-row items-center gap-2">
+          {wallet.data ? <TokenChip balance={wallet.data.tokenBalance} /> : null}
+          <NotificationBell />
+        </View>
+      }
       onRefresh={reloadAll}
       refreshing={refreshing}
     >
@@ -124,6 +133,8 @@ export default function SummaryScreen() {
       ) : !isNew && !monthError ? (
         <CardSkeleton height={96} />
       ) : null}
+
+      {!isNew && budgets.data ? <BudgetsCard budgets={budgets.data} onEdit={() => router.push("/budgets")} /> : null}
 
       {goals.error ? <ErrorState error={goals.error} onRetry={goals.reload} /> : null}
       {!isNew && inProgress.length > 0 ? <GoalsCard goals={nearestGoals(inProgress)} onSeeAll={() => router.navigate("/goals")} /> : null}
