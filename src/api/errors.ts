@@ -97,7 +97,7 @@ export function userMessage(error: ApiError): string {
     case 409:
       return error.serverMessage ?? 'Los datos cambiaron mientras trabajabas. Vuelve a intentarlo.'
     case 429:
-      return 'Hiciste demasiadas solicitudes seguidas. Espera un momento.'
+      return error.serverMessage ?? 'Hiciste demasiadas solicitudes seguidas. Espera un momento.'
     default:
       return 'Algo falló en el servidor. Inténtalo de nuevo en unos segundos.'
   }
